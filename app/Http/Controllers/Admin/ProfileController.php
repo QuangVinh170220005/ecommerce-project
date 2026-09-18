@@ -4,6 +4,7 @@ namespace App\Http\Controllers\admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\admin\UpdateProfileRequest;
+use App\Models\Country;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
@@ -15,7 +16,8 @@ class ProfileController extends Controller
     }
     function getProfile(){
         $user = Auth::user();
-        return view('admin.user.profile', compact('user'));
+        $country = Country::all();
+        return view('admin.user.profile', compact('user', 'country'));
     }
 
     function updateProfile(UpdateProfileRequest $req){
