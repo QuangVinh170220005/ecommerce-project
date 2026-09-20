@@ -129,7 +129,7 @@
                                 <select class="form-control form-control-line" name="id_country">
                                     <option value="">-- Select Country --</option>
                                     @foreach ($country as $ctr)
-                                        <option value="{{ $ctr->id }}"
+                                        <option value="{{ $ctr->id }}" @selected($user->id_country == $ctr->id)>
                                             {{ $ctr->name }}
                                         </option>
                                     @endforeach

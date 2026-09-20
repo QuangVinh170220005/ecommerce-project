@@ -28,7 +28,7 @@ class UpdateProfileRequest extends FormRequest
             'password' => 'nullable',
             'phone' => 'nullable',
             'address' => 'nullable',
-            'id_country' => 'nullable',
+            'id_country' => 'required',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ];
     }
@@ -39,7 +39,7 @@ class UpdateProfileRequest extends FormRequest
 
             'email.required' => 'Vui lòng nhập email.',
             'email.email' => 'Email không đúng định dạng.',
-
+            'id_country.required' => 'Vui lòng chọn quốc gia.',
             'avatar.image' => 'File tải lên phải là hình ảnh.',
             'avatar.mimes' => 'Avatar phải có định dạng jpeg, png, jpg hoặc gif.',
             'avatar.max' => 'Avatar không được lớn hơn 1MB.',
