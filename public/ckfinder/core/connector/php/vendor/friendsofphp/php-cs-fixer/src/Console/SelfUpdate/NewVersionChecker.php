@@ -20,8 +20,6 @@ use Composer\Semver\VersionParser;
 
 /**
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class NewVersionChecker implements NewVersionCheckerInterface
 {
@@ -30,9 +28,9 @@ final class NewVersionChecker implements NewVersionCheckerInterface
     private VersionParser $versionParser;
 
     /**
-     * @var null|list<string>
+     * @var null|string[]
      */
-    private ?array $availableVersions = null;
+    private $availableVersions;
 
     public function __construct(GithubClientInterface $githubClient)
     {
@@ -84,7 +82,9 @@ final class NewVersionChecker implements NewVersionCheckerInterface
             return;
         }
 
-        foreach ($this->githubClient->getTags() as $version) {
+        foreach ($this->githubClient->getTags() as $tag) {
+            $version = $tag['name'];
+
             try {
                 $this->versionParser->normalize($version);
 
@@ -96,9 +96,6 @@ final class NewVersionChecker implements NewVersionCheckerInterface
             }
         }
 
-        $versions = Semver::rsort($this->availableVersions);
-        \assert(array_is_list($versions)); // Semver::rsort provides soft `array` type, let's validate and ensure proper type for SCA
-
-        $this->availableVersions = $versions;
+        $this->availableVersions = Semver::rsort($this->availableVersions);
     }
 }

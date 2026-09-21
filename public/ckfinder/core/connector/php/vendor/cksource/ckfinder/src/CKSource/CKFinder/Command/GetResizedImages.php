@@ -35,8 +35,8 @@ class GetResizedImages extends CommandAbstract
      */
     public function execute(Request $request, WorkingFolder $workingFolder, ResizedImageRepository $resizedImageRepository, Config $config, CacheManager $cache)
     {
-        $fileName = (string) $request->query->get('fileName');
-        $sizes = (string) $request->query->get('sizes');
+        $fileName = (string) $request->get('fileName');
+        $sizes = (string) $request->get('sizes');
 
         $ext = pathinfo($fileName, PATHINFO_EXTENSION);
 

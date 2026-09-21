@@ -22,31 +22,27 @@ use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 /**
  * @author Graham Campbell <hello@gjcampbell.co.uk>
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class PhpdocNoPackageFixer extends AbstractProxyFixer
 {
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-            '`@package` and `@subpackage` annotations must be removed from PHPDoc.',
+            '`@package` and `@subpackage` annotations should be omitted from PHPDoc.',
             [
                 new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        /**
-                         * @internal
-                         * @package Foo
-                         * subpackage Bar
-                         */
-                        class Baz
-                        {
-                        }
-
-                        PHP,
+                    '<?php
+/**
+ * @internal
+ * @package Foo
+ * subpackage Bar
+ */
+class Baz
+{
+}
+'
                 ),
-            ],
+            ]
         );
     }
 
@@ -64,10 +60,7 @@ final class PhpdocNoPackageFixer extends AbstractProxyFixer
     protected function createProxyFixers(): array
     {
         $fixer = new GeneralPhpdocAnnotationRemoveFixer();
-        $fixer->configure([
-            'annotations' => ['package', 'subpackage'],
-            'case_sensitive' => true,
-        ]);
+        $fixer->configure(['annotations' => ['package', 'subpackage']]);
 
         return [$fixer];
     }

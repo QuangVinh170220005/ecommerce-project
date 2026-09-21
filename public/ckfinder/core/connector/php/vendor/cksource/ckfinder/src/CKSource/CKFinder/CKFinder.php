@@ -276,7 +276,7 @@ class CKFinder extends Container implements HttpKernelInterface
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this['dispatcher'];
 
-        $commandName = $event->getRequest()->query->get('command');
+        $commandName = $event->getRequest()->get('command');
         $eventName = CKFinderEvent::CREATE_RESPONSE_PREFIX.lcfirst($commandName);
         $dispatcher->dispatch($event, $eventName);
 
@@ -292,7 +292,7 @@ class CKFinder extends Container implements HttpKernelInterface
         /** @var EventDispatcher $dispatcher */
         $dispatcher = $this['dispatcher'];
 
-        $commandName = $event->getRequest()->query->get('command');
+        $commandName = $event->getRequest()->get('command');
         $eventName = CKFinderEvent::AFTER_COMMAND_PREFIX.lcfirst($commandName);
         $afterCommandEvent = new AfterCommandEvent($this, $commandName, $event->getResponse());
         $dispatcher->dispatch($afterCommandEvent, $eventName);
@@ -324,9 +324,9 @@ class CKFinder extends Container implements HttpKernelInterface
     /**
      * Main method used to handle a request by CKFinder.
      *
-     * @param ?Request $request request object
+     * @param Request $request request object
      */
-    public function run(?Request $request = null)
+    public function run(Request $request = null)
     {
         $request = null === $request ? Request::createFromGlobals() : $request;
 

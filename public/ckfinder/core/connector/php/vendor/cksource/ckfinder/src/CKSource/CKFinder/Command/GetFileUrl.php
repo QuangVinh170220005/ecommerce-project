@@ -34,10 +34,10 @@ class GetFileUrl extends CommandAbstract
      */
     public function execute(WorkingFolder $workingFolder, Request $request)
     {
-        $fileName = (string) $request->query->get('fileName');
-        $thumbnail = (string) $request->query->get('thumbnail');
+        $fileName = (string) $request->get('fileName');
+        $thumbnail = (string) $request->get('thumbnail');
 
-        $fileNames = (array) $request->query->all('fileNames');
+        $fileNames = (array) $request->get('fileNames');
 
         if (!empty($fileNames)) {
             $urls = [];

@@ -26,8 +26,6 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @author Graham Campbell <hello@gjcampbell.co.uk>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class PhpdocSummaryFixer extends AbstractFixer implements WhitespacesAwareFixerInterface
 {
@@ -35,18 +33,12 @@ final class PhpdocSummaryFixer extends AbstractFixer implements WhitespacesAware
     {
         return new FixerDefinition(
             'PHPDoc summary should end in either a full stop, exclamation mark, or question mark.',
-            [
-                new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        /**
-                         * Foo function is great
-                         */
-                        function foo () {}
-
-                        PHP,
-                ),
-            ],
+            [new CodeSample('<?php
+/**
+ * Foo function is great
+ */
+function foo () {}
+')]
         );
     }
 
@@ -63,13 +55,13 @@ final class PhpdocSummaryFixer extends AbstractFixer implements WhitespacesAware
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(\T_DOC_COMMENT);
+        return $tokens->isTokenKindFound(T_DOC_COMMENT);
     }
 
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(\T_DOC_COMMENT)) {
+            if (!$token->isGivenKind(T_DOC_COMMENT)) {
                 continue;
             }
 
@@ -80,14 +72,9 @@ final class PhpdocSummaryFixer extends AbstractFixer implements WhitespacesAware
                 $line = $doc->getLine($end);
                 $content = rtrim($line->getContent());
 
-                if (
-                    // final line of Description is NOT properly formatted
-                    !$this->isCorrectlyFormatted($content)
-                    // and first line  of Description, if different than final line, does NOT indicate a list
-                    && (1 === $end || ($doc->isMultiLine() && ':' !== substr(rtrim($doc->getLine(1)->getContent()), -1)))
-                ) {
+                if (!$this->isCorrectlyFormatted($content)) {
                     $line->setContent($content.'.'.$this->whitespacesConfig->getLineEnding());
-                    $tokens[$index] = new Token([\T_DOC_COMMENT, $doc->getContent()]);
+                    $tokens[$index] = new Token([T_DOC_COMMENT, $doc->getContent()]);
                 }
             }
         }
@@ -98,10 +85,10 @@ final class PhpdocSummaryFixer extends AbstractFixer implements WhitespacesAware
      */
     private function isCorrectlyFormatted(string $content): bool
     {
-        if (str_contains(strtolower($content), strtolower('{@inheritdoc}'))) {
+        if (false !== stripos($content, '{@inheritdoc}')) {
             return true;
         }
 
-        return $content !== rtrim($content, '.:。!?¡¿！？');
+        return $content !== rtrim($content, '.。!?¡¿！？');
     }
 }

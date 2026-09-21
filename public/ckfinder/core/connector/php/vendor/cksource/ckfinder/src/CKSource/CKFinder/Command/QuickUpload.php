@@ -54,13 +54,13 @@ class QuickUpload extends FileUpload
     {
         $request = $event->getRequest();
 
-        if ('json' === $request->query->get('responseType')) {
+        if ('json' === $request->get('responseType')) {
             return;
         }
 
         $response = $event->getResponse();
 
-        $funcNum = (string) $request->query->get('CKEditorFuncNum');
+        $funcNum = (string) $request->get('CKEditorFuncNum');
         $funcNum = preg_replace('/[^0-9]/', '', $funcNum);
 
         if ($response instanceof JsonResponse) {

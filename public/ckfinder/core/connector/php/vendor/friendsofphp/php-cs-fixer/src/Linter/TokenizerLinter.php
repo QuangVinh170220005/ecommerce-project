@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace PhpCsFixer\Linter;
 
 use PhpCsFixer\FileReader;
-use PhpCsFixer\Hasher;
+use PhpCsFixer\Tokenizer\CodeHasher;
 use PhpCsFixer\Tokenizer\Tokens;
 
 /**
@@ -23,11 +23,7 @@ use PhpCsFixer\Tokenizer\Tokens;
  *
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
  *
- * @readonly
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class TokenizerLinter implements LinterInterface
 {
@@ -48,12 +44,12 @@ final class TokenizerLinter implements LinterInterface
             // During that process, it might throw a ParseError or CompileError.
             // If it won't, cache of tokenized version of source will be kept, which is great for Runner.
             // Yet, first we need to clear already existing cache to not hit it and lint the code indeed.
-            $codeHash = Hasher::calculate($source);
+            $codeHash = CodeHasher::calculateCodeHash($source);
             Tokens::clearCache($codeHash);
             Tokens::fromCode($source);
 
             return new TokenizerLintingResult();
-        } catch (\CompileError|\ParseError $e) {
+        } catch (\ParseError|\CompileError $e) {
             return new TokenizerLintingResult($e);
         }
     }

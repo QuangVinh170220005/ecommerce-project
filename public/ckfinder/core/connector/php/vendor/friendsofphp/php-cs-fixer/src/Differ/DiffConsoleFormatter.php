@@ -20,11 +20,7 @@ use Symfony\Component\Console\Formatter\OutputFormatter;
 /**
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
  *
- * @readonly
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class DiffConsoleFormatter
 {
@@ -46,10 +42,10 @@ final class DiffConsoleFormatter
             ? $this->template
             : Preg::replace('/<[^<>]+>/', '', $this->template);
 
-        return \sprintf(
+        return sprintf(
             $template,
             implode(
-                \PHP_EOL,
+                PHP_EOL,
                 array_map(
                     static function (string $line) use ($isDecorated, $lineTemplate): string {
                         if ($isDecorated) {
@@ -65,11 +61,11 @@ final class DiffConsoleFormatter
                                         $colour = 'cyan';
                                     }
 
-                                    return \sprintf('<fg=%s>%s</fg=%s>', $colour, OutputFormatter::escape($matches[0]), $colour);
+                                    return sprintf('<fg=%s>%s</fg=%s>', $colour, OutputFormatter::escape($matches[0]), $colour);
                                 },
                                 $line,
                                 1,
-                                $count,
+                                $count
                             );
 
                             if (0 === $count) {
@@ -77,11 +73,11 @@ final class DiffConsoleFormatter
                             }
                         }
 
-                        return \sprintf($lineTemplate, $line);
+                        return sprintf($lineTemplate, $line);
                     },
-                    Preg::split('#\R#u', $diff),
-                ),
-            ),
+                    Preg::split('#\R#u', $diff)
+                )
+            )
         );
     }
 }

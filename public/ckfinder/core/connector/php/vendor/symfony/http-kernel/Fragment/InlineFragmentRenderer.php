@@ -27,10 +27,13 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 class InlineFragmentRenderer extends RoutableFragmentRenderer
 {
-    public function __construct(
-        private HttpKernelInterface $kernel,
-        private ?EventDispatcherInterface $dispatcher = null,
-    ) {
+    private HttpKernelInterface $kernel;
+    private ?EventDispatcherInterface $dispatcher;
+
+    public function __construct(HttpKernelInterface $kernel, EventDispatcherInterface $dispatcher = null)
+    {
+        $this->kernel = $kernel;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -100,7 +103,10 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         }
     }
 
-    protected function createSubRequest(string $uri, Request $request): Request
+    /**
+     * @return Request
+     */
+    protected function createSubRequest(string $uri, Request $request)
     {
         $cookies = $request->cookies->all();
         $server = $request->server->all();
@@ -118,17 +124,14 @@ class InlineFragmentRenderer extends RoutableFragmentRenderer
         $setSession ??= \Closure::bind(static function ($subRequest, $request) { $subRequest->session = $request->session; }, null, Request::class);
         $setSession($subRequest, $request);
 
-        if ($request->attributes->has('_format')) {
-            $subRequest->attributes->set('_format', $request->attributes->get('_format'));
+        if ($request->get('_format')) {
+            $subRequest->attributes->set('_format', $request->get('_format'));
         }
         if ($request->getDefaultLocale() !== $request->getLocale()) {
             $subRequest->setLocale($request->getLocale());
         }
         if ($request->attributes->has('_stateless')) {
             $subRequest->attributes->set('_stateless', $request->attributes->get('_stateless'));
-        }
-        if ($request->attributes->has('_check_controller_is_allowed')) {
-            $subRequest->attributes->set('_check_controller_is_allowed', $request->attributes->get('_check_controller_is_allowed'));
         }
 
         return $subRequest;

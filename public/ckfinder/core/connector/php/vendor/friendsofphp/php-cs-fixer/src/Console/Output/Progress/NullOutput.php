@@ -14,18 +14,14 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Console\Output\Progress;
 
-use PhpCsFixer\Runner\Event\FileProcessed;
+use PhpCsFixer\FixerFileProcessedEvent;
 
 /**
- * @readonly
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class NullOutput implements ProgressOutputInterface
 {
     public function printLegend(): void {}
 
-    public function onFixerFileProcessed(FileProcessed $event): void {}
+    public function onFixerFileProcessed(FixerFileProcessedEvent $event): void {}
 }

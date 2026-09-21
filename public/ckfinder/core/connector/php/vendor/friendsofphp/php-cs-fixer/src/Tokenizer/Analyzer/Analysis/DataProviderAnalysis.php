@@ -14,33 +14,20 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Tokenizer\Analyzer\Analysis;
 
-/**
- * @internal
- *
- * @readonly
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
- */
 final class DataProviderAnalysis
 {
     private string $name;
 
     private int $nameIndex;
 
-    /** @var non-empty-list<array{int, int}> */
+    /** @var array<int> */
     private array $usageIndices;
 
     /**
-     * @param non-empty-list<array{int, int}> $usageIndices
+     * @param array<int> $usageIndices
      */
     public function __construct(string $name, int $nameIndex, array $usageIndices)
     {
-        if ([] === $usageIndices || !array_is_list($usageIndices)) {
-            throw new \InvalidArgumentException(
-                'Parameter "usageIndices" should be a non-empty-list.',
-            );
-        }
-
         $this->name = $name;
         $this->nameIndex = $nameIndex;
         $this->usageIndices = $usageIndices;
@@ -57,7 +44,7 @@ final class DataProviderAnalysis
     }
 
     /**
-     * @return non-empty-list<array{int, int}>
+     * @return array<int>
      */
     public function getUsageIndices(): array
     {

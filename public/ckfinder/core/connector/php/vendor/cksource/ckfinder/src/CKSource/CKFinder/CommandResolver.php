@@ -98,7 +98,7 @@ class CommandResolver implements ControllerResolverInterface
      */
     public function getController(Request $request): callable|false
     {
-        $commandName = ucfirst((string) $request->query->get('command'));
+        $commandName = ucfirst((string) $request->get('command'));
 
         /** @var Command\CommandAbstract $commandObject */
         $commandObject = null;

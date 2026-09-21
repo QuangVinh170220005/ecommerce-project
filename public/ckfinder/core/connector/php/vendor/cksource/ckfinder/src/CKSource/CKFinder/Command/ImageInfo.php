@@ -35,7 +35,7 @@ class ImageInfo extends CommandAbstract
 
     public function execute(Request $request, WorkingFolder $workingFolder, Config $config, CacheManager $cache)
     {
-        $fileName = (string) $request->query->get('fileName');
+        $fileName = (string) $request->get('fileName');
 
         if (null === $fileName || !File::isValidName($fileName, $config->get('disallowUnsafeCharacters'))) {
             throw new InvalidRequestException('Invalid file name');

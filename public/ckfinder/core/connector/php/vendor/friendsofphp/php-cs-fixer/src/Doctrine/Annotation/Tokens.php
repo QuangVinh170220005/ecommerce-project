@@ -14,6 +14,7 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Doctrine\Annotation;
 
+use PhpCsFixer\Doctrine\Annotation\Token as AnnotationToken;
 use PhpCsFixer\Preg;
 use PhpCsFixer\Tokenizer\Token as PhpToken;
 
@@ -23,26 +24,17 @@ use PhpCsFixer\Tokenizer\Token as PhpToken;
  * @internal
  *
  * @extends \SplFixedArray<Token>
- *
- * `SplFixedArray` uses `T|null` in return types because value can be null if an offset is unset or if the size does not match the number of elements.
- * But our class takes care of it and always ensures correct size and indexes, so that these methods never return `null` instead of `Token`.
- *
- * @method Token                    offsetGet($offset)
- * @method \Traversable<int, Token> getIterator()
- * @method array<int, Token>        toArray()
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class Tokens extends \SplFixedArray
 {
     /**
-     * @param list<string> $ignoredTags
+     * @param string[] $ignoredTags
      *
      * @throws \InvalidArgumentException
      */
     public static function createFromDocComment(PhpToken $input, array $ignoredTags = []): self
     {
-        if (!$input->isGivenKind(\T_DOC_COMMENT)) {
+        if (!$input->isGivenKind(T_DOC_COMMENT)) {
             throw new \InvalidArgumentException('Input must be a T_DOC_COMMENT token.');
         }
 
@@ -109,21 +101,21 @@ final class Tokens extends \SplFixedArray
                 }
 
                 $lastTokenEndIndex = 0;
-                foreach (\array_slice($scannedTokens, 0, $nbScannedTokensToUse) as $scannedToken) {
-                    $token = $scannedToken->isType(DocLexer::T_STRING)
-                        ? new Token(
-                            $scannedToken->getType(),
-                            '"'.str_replace('"', '""', $scannedToken->getContent()).'"',
-                            $scannedToken->getPosition(),
-                        )
-                        : $scannedToken;
+                foreach (\array_slice($scannedTokens, 0, $nbScannedTokensToUse) as $token) {
+                    if ($token->isType(DocLexer::T_STRING)) {
+                        $token = new AnnotationToken(
+                            $token->getType(),
+                            '"'.str_replace('"', '""', $token->getContent()).'"',
+                            $token->getPosition()
+                        );
+                    }
 
                     $missingTextLength = $token->getPosition() - $lastTokenEndIndex;
                     if ($missingTextLength > 0) {
                         $tokens[] = new Token(DocLexer::T_NONE, substr(
                             $content,
                             $nextAtPosition + $lastTokenEndIndex,
-                            $missingTextLength,
+                            $missingTextLength
                         ));
                     }
 
@@ -147,8 +139,8 @@ final class Tokens extends \SplFixedArray
     /**
      * Create token collection from array.
      *
-     * @param array<int, Token> $array       the array to import
-     * @param ?bool             $saveIndices save the numeric indices used in the original array, default is yes
+     * @param Token[] $array       the array to import
+     * @param ?bool   $saveIndices save the numeric indices used in the original array, default is yes
      */
     public static function fromArray($array, $saveIndices = null): self
     {
@@ -175,6 +167,14 @@ final class Tokens extends \SplFixedArray
     public function getNextMeaningfulToken(int $index): ?int
     {
         return $this->getMeaningfulTokenSibling($index, 1);
+    }
+
+    /**
+     * Returns the index of the closest previous token that is neither a comment nor a whitespace token.
+     */
+    public function getPreviousMeaningfulToken(int $index): ?int
+    {
+        return $this->getMeaningfulTokenSibling($index, -1);
     }
 
     /**
@@ -246,8 +246,18 @@ final class Tokens extends \SplFixedArray
 
     public function offsetSet($index, $token): void
     {
+        if (null === $token) {
+            throw new \InvalidArgumentException('Token must be an instance of PhpCsFixer\\Doctrine\\Annotation\\Token, "null" given.');
+        }
+
         if (!$token instanceof Token) {
-            throw new \InvalidArgumentException(\sprintf('Token must be an instance of %s, "%s" given.', Token::class, get_debug_type($token)));
+            $type = \gettype($token);
+
+            if ('object' === $type) {
+                $type = \get_class($token);
+            }
+
+            throw new \InvalidArgumentException(sprintf('Token must be an instance of PhpCsFixer\\Doctrine\\Annotation\\Token, "%s" given.', $type));
         }
 
         parent::offsetSet($index, $token);
@@ -261,7 +271,7 @@ final class Tokens extends \SplFixedArray
     public function offsetUnset($index): void
     {
         if (!isset($this[$index])) {
-            throw new \OutOfBoundsException(\sprintf('Index "%s" is invalid or does not exist.', $index));
+            throw new \OutOfBoundsException(sprintf('Index "%s" is invalid or does not exist.', $index));
         }
 
         $max = \count($this) - 1;

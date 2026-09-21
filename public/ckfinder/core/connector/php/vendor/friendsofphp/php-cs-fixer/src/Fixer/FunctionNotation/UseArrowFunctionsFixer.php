@@ -25,15 +25,13 @@ use PhpCsFixer\Tokenizer\TokensAnalyzer;
 
 /**
  * @author Gregor Harlan
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class UseArrowFunctionsFixer extends AbstractFixer
 {
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-            'Anonymous functions with return as the only statement must use arrow functions.',
+            'Anonymous functions with one-liner return statement must use arrow functions.',
             [
                 new CodeSample(
                     <<<'SAMPLE'
@@ -42,17 +40,18 @@ final class UseArrowFunctionsFixer extends AbstractFixer
                             return $a + $b;
                         });
 
-                        SAMPLE,
+                        SAMPLE
+                    ,
                 ),
             ],
             null,
-            'Risky when using `isset()` on outside variables that are not imported with `use ()`.',
+            'Risky when using `isset()` on outside variables that are not imported with `use ()`.'
         );
     }
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isAllTokenKindsFound([\T_FUNCTION, \T_RETURN]);
+        return $tokens->isAllTokenKindsFound([T_FUNCTION, T_RETURN]);
     }
 
     public function isRisky(): bool
@@ -75,11 +74,12 @@ final class UseArrowFunctionsFixer extends AbstractFixer
         $analyzer = new TokensAnalyzer($tokens);
 
         for ($index = $tokens->count() - 1; $index > 0; --$index) {
-            if (!$tokens[$index]->isGivenKind(\T_FUNCTION) || !$analyzer->isLambda($index)) {
+            if (!$tokens[$index]->isGivenKind(T_FUNCTION) || !$analyzer->isLambda($index)) {
                 continue;
             }
 
-            // Find parameters
+            // Find parameters end
+            // Abort if they are multilined
 
             $parametersStart = $tokens->getNextMeaningfulToken($index);
 
@@ -88,6 +88,10 @@ final class UseArrowFunctionsFixer extends AbstractFixer
             }
 
             $parametersEnd = $tokens->findBlockEnd(Tokens::BLOCK_TYPE_PARENTHESIS_BRACE, $parametersStart);
+
+            if ($this->isMultilined($tokens, $parametersStart, $parametersEnd)) {
+                continue;
+            }
 
             // Find `use ()` start and end
             // Abort if it contains reference variables
@@ -100,7 +104,7 @@ final class UseArrowFunctionsFixer extends AbstractFixer
             if ($tokens[$next]->isGivenKind(CT::T_USE_LAMBDA)) {
                 $useStart = $next;
 
-                if ($tokens[$useStart - 1]->isGivenKind(\T_WHITESPACE)) {
+                if ($tokens[$useStart - 1]->isGivenKind(T_WHITESPACE)) {
                     --$useStart;
                 }
 
@@ -125,11 +129,11 @@ final class UseArrowFunctionsFixer extends AbstractFixer
             $braceOpen = $tokens[$next]->equals('{') ? $next : $tokens->getNextTokenOfKind($next, ['{']);
             $return = $braceOpen + 1;
 
-            if ($tokens[$return]->isGivenKind(\T_WHITESPACE)) {
+            if ($tokens[$return]->isGivenKind(T_WHITESPACE)) {
                 ++$return;
             }
 
-            if (!$tokens[$return]->isGivenKind(\T_RETURN)) {
+            if (!$tokens[$return]->isGivenKind(T_RETURN)) {
                 continue;
             }
 
@@ -146,11 +150,17 @@ final class UseArrowFunctionsFixer extends AbstractFixer
 
             $braceClose = $semicolon + 1;
 
-            if ($tokens[$braceClose]->isGivenKind(\T_WHITESPACE)) {
+            if ($tokens[$braceClose]->isGivenKind(T_WHITESPACE)) {
                 ++$braceClose;
             }
 
             if (!$tokens[$braceClose]->equals('}')) {
+                continue;
+            }
+
+            // Abort if the `return` statement is multilined
+
+            if ($this->isMultilined($tokens, $return, $semicolon)) {
                 continue;
             }
 
@@ -160,18 +170,27 @@ final class UseArrowFunctionsFixer extends AbstractFixer
         }
     }
 
-    private function transform(Tokens $tokens, int $index, ?int $useStart, ?int $useEnd, int $braceOpen, int $return, int $semicolon, int $braceClose): void
+    private function isMultilined(Tokens $tokens, int $start, int $end): bool
     {
-        $tokensToInsert = [new Token([\T_DOUBLE_ARROW, '=>'])];
-
-        if ($tokens->getNextMeaningfulToken($return) === $semicolon) {
-            $tokensToInsert[] = new Token([\T_WHITESPACE, ' ']);
-            $tokensToInsert[] = new Token([\T_STRING, 'null']);
+        for ($i = $start; $i < $end; ++$i) {
+            if (str_contains($tokens[$i]->getContent(), "\n")) {
+                return true;
+            }
         }
 
-        $tokens->clearRange($semicolon, $braceClose - 1);
-        $tokens->clearTokenAndMergeSurroundingWhitespace($braceClose);
+        return false;
+    }
 
+    private function transform(Tokens $tokens, int $index, ?int $useStart, ?int $useEnd, int $braceOpen, int $return, int $semicolon, int $braceClose): void
+    {
+        $tokensToInsert = [new Token([T_DOUBLE_ARROW, '=>'])];
+
+        if ($tokens->getNextMeaningfulToken($return) === $semicolon) {
+            $tokensToInsert[] = new Token([T_WHITESPACE, ' ']);
+            $tokensToInsert[] = new Token([T_STRING, 'null']);
+        }
+
+        $tokens->clearRange($semicolon, $braceClose);
         $tokens->clearRange($braceOpen + 1, $return);
         $tokens->overrideRange($braceOpen, $braceOpen, $tokensToInsert);
 
@@ -179,6 +198,6 @@ final class UseArrowFunctionsFixer extends AbstractFixer
             $tokens->clearRange($useStart, $useEnd);
         }
 
-        $tokens[$index] = new Token([\T_FN, 'fn']);
+        $tokens[$index] = new Token([T_FN, 'fn']);
     }
 }

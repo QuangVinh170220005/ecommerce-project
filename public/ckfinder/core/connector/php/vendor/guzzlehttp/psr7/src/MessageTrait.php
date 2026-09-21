@@ -141,7 +141,7 @@ trait MessageTrait
     }
 
     /**
-     * @param (string|string[])[] $headers
+     * @param array<string|int, string|string[]> $headers
      */
     private function setHeaders(array $headers): void
     {
@@ -174,6 +174,10 @@ trait MessageTrait
             return $this->trimAndValidateHeaderValues([$value]);
         }
 
+        if (count($value) === 0) {
+            throw new \InvalidArgumentException('Header value can not be an empty array.');
+        }
+
         return $this->trimAndValidateHeaderValues($value);
     }
 
@@ -189,7 +193,7 @@ trait MessageTrait
      *
      * @return string[] Trimmed header values
      *
-     * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2.4
+     * @see https://tools.ietf.org/html/rfc7230#section-3.2.4
      */
     private function trimAndValidateHeaderValues(array $values): array
     {
@@ -209,7 +213,7 @@ trait MessageTrait
     }
 
     /**
-     * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+     * @see https://tools.ietf.org/html/rfc7230#section-3.2
      *
      * @param mixed $header
      */
@@ -230,7 +234,7 @@ trait MessageTrait
     }
 
     /**
-     * @see https://datatracker.ietf.org/doc/html/rfc7230#section-3.2
+     * @see https://tools.ietf.org/html/rfc7230#section-3.2
      *
      * field-value    = *( field-content / obs-fold )
      * field-content  = field-vchar [ 1*( SP / HTAB ) field-vchar ]

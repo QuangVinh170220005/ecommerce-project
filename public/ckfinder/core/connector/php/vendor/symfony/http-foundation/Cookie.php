@@ -22,9 +22,15 @@ class Cookie
     public const SAMESITE_LAX = 'lax';
     public const SAMESITE_STRICT = 'strict';
 
-    protected int $expire;
-    protected string $path;
+    protected $name;
+    protected $value;
+    protected $domain;
+    protected $expire;
+    protected $path;
+    protected $secure;
+    protected $httpOnly;
 
+    private bool $raw;
     private ?string $sameSite = null;
     private bool $secureDefault = false;
 
@@ -45,7 +51,6 @@ class Cookie
             'httponly' => false,
             'raw' => !$decode,
             'samesite' => null,
-            'partitioned' => false,
         ];
 
         $parts = HeaderUtils::split($cookie, ';=');
@@ -61,7 +66,7 @@ class Cookie
             $data['expires'] = time() + (int) $data['max-age'];
         }
 
-        return new static($name, $value, $data['expires'], $data['path'], $data['domain'], $data['secure'], $data['httponly'], $data['raw'], $data['samesite'], $data['partitioned']);
+        return new static($name, $value, $data['expires'], $data['path'], $data['domain'], $data['secure'], $data['httponly'], $data['raw'], $data['samesite']);
     }
 
     /**
@@ -69,9 +74,9 @@ class Cookie
      *
      * @param self::SAMESITE_*|''|null $sameSite
      */
-    public static function create(string $name, ?string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', ?string $domain = null, ?bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX, bool $partitioned = false): self
+    public static function create(string $name, string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX): self
     {
-        return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite, $partitioned);
+        return new self($name, $value, $expire, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 
     /**
@@ -87,29 +92,25 @@ class Cookie
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(
-        protected string $name,
-        protected ?string $value = null,
-        int|string|\DateTimeInterface $expire = 0,
-        ?string $path = '/',
-        protected ?string $domain = null,
-        protected ?bool $secure = null,
-        protected bool $httpOnly = true,
-        private bool $raw = false,
-        ?string $sameSite = self::SAMESITE_LAX,
-        private bool $partitioned = false,
-    ) {
+    public function __construct(string $name, string $value = null, int|string|\DateTimeInterface $expire = 0, ?string $path = '/', string $domain = null, bool $secure = null, bool $httpOnly = true, bool $raw = false, ?string $sameSite = self::SAMESITE_LAX)
+    {
         // from PHP source code
         if ($raw && false !== strpbrk($name, self::RESERVED_CHARS_LIST)) {
-            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" contains invalid characters.', $name));
+            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $name));
         }
 
-        if (!$name) {
+        if (empty($name)) {
             throw new \InvalidArgumentException('The cookie name cannot be empty.');
         }
 
+        $this->name = $name;
+        $this->value = $value;
+        $this->domain = $domain;
         $this->expire = self::expiresTimestamp($expire);
-        $this->path = $path ?: '/';
+        $this->path = empty($path) ? '/' : $path;
+        $this->secure = $secure;
+        $this->httpOnly = $httpOnly;
+        $this->raw = $raw;
         $this->sameSite = $this->withSameSite($sameSite)->sameSite;
     }
 
@@ -204,7 +205,7 @@ class Cookie
     public function withRaw(bool $raw = true): static
     {
         if ($raw && false !== strpbrk($this->name, self::RESERVED_CHARS_LIST)) {
-            throw new \InvalidArgumentException(\sprintf('The cookie name "%s" contains invalid characters.', $this->name));
+            throw new \InvalidArgumentException(sprintf('The cookie name "%s" contains invalid characters.', $this->name));
         }
 
         $cookie = clone $this;
@@ -232,17 +233,6 @@ class Cookie
 
         $cookie = clone $this;
         $cookie->sameSite = $sameSite;
-
-        return $cookie;
-    }
-
-    /**
-     * Creates a cookie copy that is tied to the top-level site in cross-site context.
-     */
-    public function withPartitioned(bool $partitioned = true): static
-    {
-        $cookie = clone $this;
-        $cookie->partitioned = $partitioned;
 
         return $cookie;
     }
@@ -278,20 +268,16 @@ class Cookie
             $str .= '; domain='.$this->getDomain();
         }
 
-        if ($this->isSecure()) {
+        if (true === $this->isSecure()) {
             $str .= '; secure';
         }
 
-        if ($this->isHttpOnly()) {
+        if (true === $this->isHttpOnly()) {
             $str .= '; httponly';
         }
 
         if (null !== $this->getSameSite()) {
             $str .= '; samesite='.$this->getSameSite();
-        }
-
-        if ($this->isPartitioned()) {
-            $str .= '; partitioned';
         }
 
         return $str;
@@ -336,7 +322,7 @@ class Cookie
     {
         $maxAge = $this->expire - time();
 
-        return max(0, $maxAge);
+        return 0 >= $maxAge ? 0 : $maxAge;
     }
 
     /**
@@ -377,14 +363,6 @@ class Cookie
     public function isRaw(): bool
     {
         return $this->raw;
-    }
-
-    /**
-     * Checks whether the cookie should be tied to the top-level site in cross-site context.
-     */
-    public function isPartitioned(): bool
-    {
-        return $this->partitioned;
     }
 
     /**

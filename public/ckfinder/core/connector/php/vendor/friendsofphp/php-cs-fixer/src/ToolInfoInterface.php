@@ -16,8 +16,6 @@ namespace PhpCsFixer;
 
 /**
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 interface ToolInfoInterface
 {
@@ -33,8 +31,6 @@ interface ToolInfoInterface
     public function isInstalledAsPhar(): bool;
 
     public function isInstalledByComposer(): bool;
-
-    public function isRunInsideDocker(): bool;
 
     public function getPharDownloadUri(string $version): string;
 }

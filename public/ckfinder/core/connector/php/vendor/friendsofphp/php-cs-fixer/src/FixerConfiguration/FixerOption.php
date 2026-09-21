@@ -14,11 +14,6 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\FixerConfiguration;
 
-/**
- * @readonly
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
- */
 final class FixerOption implements FixerOptionInterface
 {
     private string $name;
@@ -35,19 +30,22 @@ final class FixerOption implements FixerOptionInterface
     /**
      * @var null|list<string>
      */
-    private ?array $allowedTypes;
+    private $allowedTypes;
 
     /**
-     * @var null|non-empty-list<null|(callable(mixed): bool)|scalar>
+     * @var null|list<null|(callable(mixed): bool)|scalar>
      */
-    private ?array $allowedValues;
-
-    private ?\Closure $normalizer;
+    private $allowedValues;
 
     /**
-     * @param mixed                                                    $default
-     * @param null|list<string>                                        $allowedTypes
-     * @param null|non-empty-list<null|(callable(mixed): bool)|scalar> $allowedValues
+     * @var null|\Closure
+     */
+    private $normalizer;
+
+    /**
+     * @param mixed                                          $default
+     * @param null|list<string>                              $allowedTypes
+     * @param null|list<null|(callable(mixed): bool)|scalar> $allowedValues
      */
     public function __construct(
         string $name,
@@ -79,8 +77,6 @@ final class FixerOption implements FixerOptionInterface
 
         if (null !== $normalizer) {
             $this->normalizer = $this->unbind($normalizer);
-        } else {
-            $this->normalizer = null;
         }
     }
 
@@ -99,9 +95,6 @@ final class FixerOption implements FixerOptionInterface
         return !$this->isRequired;
     }
 
-    /**
-     * @return mixed
-     */
     public function getDefault()
     {
         if (!$this->hasDefault()) {

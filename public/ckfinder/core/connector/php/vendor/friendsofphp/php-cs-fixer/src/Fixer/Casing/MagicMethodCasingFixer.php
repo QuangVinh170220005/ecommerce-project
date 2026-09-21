@@ -21,15 +21,12 @@ use PhpCsFixer\FixerDefinition\FixerDefinitionInterface;
 use PhpCsFixer\Tokenizer\Token;
 use PhpCsFixer\Tokenizer\Tokens;
 
-/**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
- */
 final class MagicMethodCasingFixer extends AbstractFixer
 {
     /**
-     * @var array<string, string>
+     * @var array<string,string>
      */
-    private const MAGIC_NAMES = [
+    private static array $magicNames = [
         '__call' => '__call',
         '__callstatic' => '__callStatic',
         '__clone' => '__clone',
@@ -55,31 +52,27 @@ final class MagicMethodCasingFixer extends AbstractFixer
             'Magic method definitions and calls must be using the correct casing.',
             [
                 new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        class Foo
-                        {
-                            public function __Sleep()
-                            {
-                            }
-                        }
-
-                        PHP,
+                    '<?php
+class Foo
+{
+    public function __Sleep()
+    {
+    }
+}
+'
                 ),
                 new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        $foo->__INVOKE(1);
-
-                        PHP,
+                    '<?php
+$foo->__INVOKE(1);
+'
                 ),
-            ],
+            ]
         );
     }
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(\T_STRING) && $tokens->isAnyTokenKindsFound([\T_FUNCTION, \T_DOUBLE_COLON, ...Token::getObjectOperatorKinds()]);
+        return $tokens->isTokenKindFound(T_STRING) && $tokens->isAnyTokenKindsFound([T_FUNCTION, T_DOUBLE_COLON, ...Token::getObjectOperatorKinds()]);
     }
 
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
@@ -109,7 +102,7 @@ final class MagicMethodCasingFixer extends AbstractFixer
                 }
             }
 
-            if (!$tokens[$index]->isGivenKind(\T_STRING)) {
+            if (!$tokens[$index]->isGivenKind(T_STRING)) {
                 continue; // wrong type
             }
 
@@ -157,7 +150,7 @@ final class MagicMethodCasingFixer extends AbstractFixer
     private function isFunctionSignature(Tokens $tokens, int $index): bool
     {
         $prevIndex = $tokens->getPrevMeaningfulToken($index);
-        if (!$tokens[$prevIndex]->isGivenKind(\T_FUNCTION)) {
+        if (!$tokens[$prevIndex]->isGivenKind(T_FUNCTION)) {
             return false; // not a method signature
         }
 
@@ -177,33 +170,28 @@ final class MagicMethodCasingFixer extends AbstractFixer
     private function isStaticMethodCall(Tokens $tokens, int $index): bool
     {
         $prevIndex = $tokens->getPrevMeaningfulToken($index);
-        if (!$tokens[$prevIndex]->isGivenKind(\T_DOUBLE_COLON)) {
+        if (!$tokens[$prevIndex]->isGivenKind(T_DOUBLE_COLON)) {
             return false; // not a "simple" static method call
         }
 
         return $tokens[$tokens->getNextMeaningfulToken($index)]->equals('(');
     }
 
-    /**
-     * @phpstan-assert-if-true key-of<self::MAGIC_NAMES> $name
-     */
     private function isMagicMethodName(string $name): bool
     {
-        return isset(self::MAGIC_NAMES[$name]);
+        return isset(self::$magicNames[$name]);
     }
 
     /**
-     * @param key-of<self::MAGIC_NAMES> $name name of a magic method
-     *
-     * @return value-of<self::MAGIC_NAMES>
+     * @param string $name name of a magic method
      */
     private function getMagicMethodNameInCorrectCasing(string $name): string
     {
-        return self::MAGIC_NAMES[$name];
+        return self::$magicNames[$name];
     }
 
     private function setTokenToCorrectCasing(Tokens $tokens, int $index, string $nameInCorrectCasing): void
     {
-        $tokens[$index] = new Token([\T_STRING, $nameInCorrectCasing]);
+        $tokens[$index] = new Token([T_STRING, $nameInCorrectCasing]);
     }
 }

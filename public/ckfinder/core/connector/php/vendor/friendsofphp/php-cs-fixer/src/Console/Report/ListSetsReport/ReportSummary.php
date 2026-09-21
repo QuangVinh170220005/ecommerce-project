@@ -14,26 +14,22 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Console\Report\ListSetsReport;
 
-use PhpCsFixer\RuleSet\RuleSetDefinitionInterface;
+use PhpCsFixer\RuleSet\RuleSetDescriptionInterface;
 
 /**
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
  *
- * @readonly
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class ReportSummary
 {
     /**
-     * @var list<RuleSetDefinitionInterface>
+     * @var list<RuleSetDescriptionInterface>
      */
     private array $sets;
 
     /**
-     * @param list<RuleSetDefinitionInterface> $sets
+     * @param list<RuleSetDescriptionInterface> $sets
      */
     public function __construct(array $sets)
     {
@@ -41,7 +37,7 @@ final class ReportSummary
     }
 
     /**
-     * @return list<RuleSetDefinitionInterface>
+     * @return list<RuleSetDescriptionInterface>
      */
     public function getSets(): array
     {

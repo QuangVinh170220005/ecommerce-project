@@ -109,9 +109,9 @@ class WorkingFolder extends Folder implements EventSubscriberInterface
         /** @var Request $request */
         $request = $app['request_stack']->getCurrentRequest();
 
-        $resourceType = $app['resource_type_factory']->getResourceType((string) $request->query->get('type'));
+        $resourceType = $app['resource_type_factory']->getResourceType((string) $request->get('type'));
 
-        $this->clientCurrentFolder = Path::normalize(trim((string) $request->query->get('currentFolder')));
+        $this->clientCurrentFolder = Path::normalize(trim((string) $request->get('currentFolder')));
 
         if (!Path::isValid($this->clientCurrentFolder)) {
             throw new InvalidNameException('Invalid path');

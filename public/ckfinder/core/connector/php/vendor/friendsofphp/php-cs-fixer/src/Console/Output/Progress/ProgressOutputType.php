@@ -15,27 +15,15 @@ declare(strict_types=1);
 namespace PhpCsFixer\Console\Output\Progress;
 
 /**
- * @TODO PHP 8.1 switch this and similar classes to ENUM
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class ProgressOutputType
 {
     public const NONE = 'none';
     public const DOTS = 'dots';
-    public const BAR = 'bar';
 
-    /**
-     * @return non-empty-list<ProgressOutputType::*>
-     */
-    public static function all(): array
-    {
-        return [
-            self::BAR,
-            self::DOTS,
-            self::NONE,
-        ];
-    }
+    public const AVAILABLE = [
+        self::NONE,
+        self::DOTS,
+    ];
 }

@@ -52,8 +52,8 @@ class ImageEdit extends CommandAbstract
 
     public function execute(Request $request, WorkingFolder $workingFolder, EventDispatcher $dispatcher, Acl $acl, ResizedImageRepository $resizedImageRepository, ThumbnailRepository $thumbnailRepository, Config $config)
     {
-        $fileName = (string) $request->query->get('fileName');
-        $newFileName = (string) $request->query->get('newFileName');
+        $fileName = (string) $request->get('fileName');
+        $newFileName = (string) $request->get('newFileName');
 
         $editedImage = new EditedImage($fileName, $this->app, $newFileName);
 
@@ -74,7 +74,7 @@ class ImageEdit extends CommandAbstract
 
         $image = Image::create($editedImage->getContents());
 
-        $actions = $request->request->all('actions');
+        $actions = (array) $request->get('actions');
 
         if (empty($actions)) {
             throw new InvalidRequestException();

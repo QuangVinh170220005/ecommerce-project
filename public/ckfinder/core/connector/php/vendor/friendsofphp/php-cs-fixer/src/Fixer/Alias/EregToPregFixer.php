@@ -26,16 +26,14 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @author Matteo Beccati <matteo@beccati.com>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class EregToPregFixer extends AbstractFixer
 {
     /**
-     * @var non-empty-list<non-empty-array<int, string>> the list of the ext/ereg function names, their preg equivalent and the preg modifier(s), if any
-     *                                                   all condensed in an array of arrays
+     * @var list<array<int, string>> the list of the ext/ereg function names, their preg equivalent and the preg modifier(s), if any
+     *                               all condensed in an array of arrays
      */
-    private const FUNCTIONS = [
+    private static array $functions = [
         ['ereg', 'preg_match', ''],
         ['eregi', 'preg_match', 'i'],
         ['ereg_replace', 'preg_replace', ''],
@@ -45,9 +43,9 @@ final class EregToPregFixer extends AbstractFixer
     ];
 
     /**
-     * @var non-empty-list<string> the list of preg delimiters, in order of preference
+     * @var list<string> the list of preg delimiters, in order of preference
      */
-    private const DELIMITERS = ['/', '#', '!'];
+    private static array $delimiters = ['/', '#', '!'];
 
     public function getDefinition(): FixerDefinitionInterface
     {
@@ -55,7 +53,7 @@ final class EregToPregFixer extends AbstractFixer
             'Replace deprecated `ereg` regular expression functions with `preg`.',
             [new CodeSample("<?php \$x = ereg('[A-Z]');\n")],
             null,
-            'Risky if the `ereg` function is overridden.',
+            'Risky if the `ereg` function is overridden.'
         );
     }
 
@@ -71,7 +69,7 @@ final class EregToPregFixer extends AbstractFixer
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(\T_STRING);
+        return $tokens->isTokenKindFound(T_STRING);
     }
 
     public function isRisky(): bool
@@ -84,9 +82,9 @@ final class EregToPregFixer extends AbstractFixer
         $end = $tokens->count() - 1;
         $functionsAnalyzer = new FunctionsAnalyzer();
 
-        foreach (self::FUNCTIONS as $map) {
+        foreach (self::$functions as $map) {
             // the sequence is the function name, followed by "(" and a quoted string
-            $seq = [[\T_STRING, $map[0]], '(', [\T_CONSTANT_ENCAPSED_STRING]];
+            $seq = [[T_STRING, $map[0]], '(', [T_CONSTANT_ENCAPSED_STRING]];
             $currIndex = 0;
 
             while (true) {
@@ -139,8 +137,8 @@ final class EregToPregFixer extends AbstractFixer
                 }
 
                 // modify function and argument
-                $tokens[$match[0]] = new Token([\T_STRING, $map[1]]);
-                $tokens[$match[2]] = new Token([\T_CONSTANT_ENCAPSED_STRING, $prefix.$quote.$preg.$quote]);
+                $tokens[$match[0]] = new Token([T_STRING, $map[1]]);
+                $tokens[$match[2]] = new Token([T_CONSTANT_ENCAPSED_STRING, $prefix.$quote.$preg.$quote]);
             }
         }
     }
@@ -173,7 +171,7 @@ final class EregToPregFixer extends AbstractFixer
         // try to find something that's not used
         $delimiters = [];
 
-        foreach (self::DELIMITERS as $k => $d) {
+        foreach (self::$delimiters as $k => $d) {
             if (!str_contains($pattern, $d)) {
                 return $d;
             }
@@ -190,6 +188,6 @@ final class EregToPregFixer extends AbstractFixer
             return $a[0] <=> $b[0];
         });
 
-        return array_key_first($delimiters);
+        return key($delimiters);
     }
 }

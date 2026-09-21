@@ -67,7 +67,7 @@ class DoubleSubmitCookieTokenValidator implements TokenValidatorInterface
      */
     public function validate(Request $request)
     {
-        $paramToken = trim((string) $request->request->get($this->tokenParamName));
+        $paramToken = trim((string) $request->get($this->tokenParamName));
         $cookieToken = trim((string) $request->cookies->get($this->tokenCookieName));
 
         if (\strlen($paramToken) >= $this->minTokenLength && \strlen($cookieToken) >= $this->minTokenLength) {

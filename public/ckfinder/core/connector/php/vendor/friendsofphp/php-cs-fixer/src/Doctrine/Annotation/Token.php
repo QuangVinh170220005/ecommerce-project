@@ -18,8 +18,6 @@ namespace PhpCsFixer\Doctrine\Annotation;
  * A Doctrine annotation token.
  *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class Token
 {
@@ -68,7 +66,7 @@ final class Token
     /**
      * Returns whether the token type is one of the given types.
      *
-     * @param int|list<int> $types
+     * @param int|int[] $types
      */
     public function isType($types): bool
     {

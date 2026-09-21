@@ -27,8 +27,6 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @author Jonathan Gruber <gruberjonathan@gmail.com>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class PhpdocParamOrderFixer extends AbstractFixer
 {
@@ -36,7 +34,7 @@ final class PhpdocParamOrderFixer extends AbstractFixer
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(\T_DOC_COMMENT);
+        return $tokens->isTokenKindFound(T_DOC_COMMENT);
     }
 
     /**
@@ -56,32 +54,30 @@ final class PhpdocParamOrderFixer extends AbstractFixer
             'Orders all `@param` annotations in DocBlocks according to method signature.',
             [
                 new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        /**
-                         * Annotations in wrong order
-                         *
-                         * @param int   $a
-                         * @param Foo   $c
-                         * @param array $b
-                         */
-                        function m($a, array $b, Foo $c) {}
-
-                        PHP,
+                    '<?php
+/**
+ * Annotations in wrong order
+ *
+ * @param int   $a
+ * @param Foo   $c
+ * @param array $b
+ */
+function m($a, array $b, Foo $c) {}
+'
                 ),
-            ],
+            ]
         );
     }
 
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(\T_DOC_COMMENT)) {
+            if (!$token->isGivenKind(T_DOC_COMMENT)) {
                 continue;
             }
 
             // Check for function / closure token
-            $nextFunctionToken = $tokens->getNextTokenOfKind($index, [[\T_FUNCTION], [\T_FN]]);
+            $nextFunctionToken = $tokens->getNextTokenOfKind($index, [[T_FUNCTION], [T_FN]]);
             if (null === $nextFunctionToken) {
                 return;
             }
@@ -92,7 +88,7 @@ final class PhpdocParamOrderFixer extends AbstractFixer
                 return;
             }
 
-            $doc = new DocBlock($token->getContent());
+            $doc = new DocBlock($tokens[$index]->getContent());
             $paramAnnotations = $doc->getAnnotationsOfType(self::PARAM_TAG);
 
             if ([] === $paramAnnotations) {
@@ -102,12 +98,12 @@ final class PhpdocParamOrderFixer extends AbstractFixer
             $paramNames = $this->getFunctionParamNames($tokens, $paramBlockStart);
             $doc = $this->rewriteDocBlock($doc, $paramNames, $paramAnnotations);
 
-            $tokens[$index] = new Token([\T_DOC_COMMENT, $doc->getContent()]);
+            $tokens[$index] = new Token([T_DOC_COMMENT, $doc->getContent()]);
         }
     }
 
     /**
-     * @return list<Token>
+     * @return Token[]
      */
     private function getFunctionParamNames(Tokens $tokens, int $paramBlockStart): array
     {
@@ -115,9 +111,9 @@ final class PhpdocParamOrderFixer extends AbstractFixer
 
         $paramNames = [];
         for (
-            $i = $tokens->getNextTokenOfKind($paramBlockStart, [[\T_VARIABLE]]);
+            $i = $tokens->getNextTokenOfKind($paramBlockStart, [[T_VARIABLE]]);
             null !== $i && $i < $paramBlockEnd;
-            $i = $tokens->getNextTokenOfKind($i, [[\T_VARIABLE]])
+            $i = $tokens->getNextTokenOfKind($i, [[T_VARIABLE]])
         ) {
             $paramNames[] = $tokens[$i];
         }
@@ -128,8 +124,8 @@ final class PhpdocParamOrderFixer extends AbstractFixer
     /**
      * Overwrite the param annotations in order.
      *
-     * @param list<Token>                $paramNames
-     * @param non-empty-list<Annotation> $paramAnnotations
+     * @param Token[]      $paramNames
+     * @param Annotation[] $paramAnnotations
      */
     private function rewriteDocBlock(DocBlock $doc, array $paramNames, array $paramAnnotations): DocBlock
     {
@@ -165,32 +161,35 @@ final class PhpdocParamOrderFixer extends AbstractFixer
     /**
      * Sort the param annotations according to the function parameters.
      *
-     * @param list<Token>                $funcParamNames
-     * @param non-empty-list<Annotation> $paramAnnotations
+     * @param Token[]      $funcParamNames
+     * @param Annotation[] $paramAnnotations
      *
-     * @return non-empty-list<string>
+     * @return string[]
      */
     private function sortParamAnnotations(array $funcParamNames, array $paramAnnotations): array
     {
         $validParams = [];
         foreach ($funcParamNames as $paramName) {
-            foreach ($this->findParamAnnotationByIdentifier($paramAnnotations, $paramName->getContent()) as $index => $annotation) {
-                // Found an exactly matching @param annotation
-                $validParams[$index] = $annotation->getContent();
+            $indices = $this->findParamAnnotationByIdentifier($paramAnnotations, $paramName->getContent());
+
+            // Found an exactly matching @param annotation
+            if (\is_array($indices)) {
+                foreach ($indices as $index) {
+                    $validParams[$index] = $paramAnnotations[$index]->getContent();
+                }
             }
         }
 
         // Detect superfluous annotations
-        $invalidParams = array_values(
-            array_diff_key($paramAnnotations, $validParams),
-        );
+        /** @var Annotation[] $invalidParams */
+        $invalidParams = array_diff_key($paramAnnotations, $validParams);
+        $invalidParams = array_values($invalidParams);
 
         // Append invalid parameters to the (ordered) valid ones
         $orderedParams = array_values($validParams);
         foreach ($invalidParams as $params) {
             $orderedParams[] = $params->getContent();
         }
-        \assert(\count($orderedParams) > 0);
 
         return $orderedParams;
     }
@@ -198,9 +197,9 @@ final class PhpdocParamOrderFixer extends AbstractFixer
     /**
      * Fetch all annotations except the param ones.
      *
-     * @param list<Annotation> $paramAnnotations
+     * @param Annotation[] $paramAnnotations
      *
-     * @return list<string>
+     * @return string[]
      */
     private function getOtherAnnotationsBetweenParams(DocBlock $doc, array $paramAnnotations): array
     {
@@ -228,17 +227,17 @@ final class PhpdocParamOrderFixer extends AbstractFixer
     /**
      * Return the indices of the lines of a specific parameter annotation.
      *
-     * @param list<Annotation> $paramAnnotations
+     * @param Annotation[] $paramAnnotations
      *
-     * @return array<int, Annotation> Mapping of found indices and corresponding Annotations
+     * @return null|array<int>
      */
-    private function findParamAnnotationByIdentifier(array $paramAnnotations, string $identifier): array
+    private function findParamAnnotationByIdentifier(array $paramAnnotations, string $identifier): ?array
     {
         $blockLevel = 0;
         $blockMatch = false;
         $blockIndices = [];
 
-        $paramRegex = '/\*\h*@param\h*(?:|'.TypeExpression::REGEX_TYPES.'\h*)&?(?=\$\b)'.preg_quote($identifier).'\b/';
+        $paramRegex = '/\*\s*@param\s*(?:|'.TypeExpression::REGEX_TYPES.'\s*)&?(?=\$\b)'.preg_quote($identifier).'\b/';
 
         foreach ($paramAnnotations as $i => $param) {
             $blockStart = Preg::match('/\s*{\s*/', $param->getContent());
@@ -248,7 +247,7 @@ final class PhpdocParamOrderFixer extends AbstractFixer
                 if ($blockStart) {
                     $blockMatch = true; // Start of a nested block
                 } else {
-                    return [$i => $param]; // Top level match
+                    return [$i]; // Top level match
                 }
             }
 
@@ -261,13 +260,13 @@ final class PhpdocParamOrderFixer extends AbstractFixer
             }
 
             if ($blockMatch) {
-                $blockIndices[$i] = $param;
+                $blockIndices[] = $i;
                 if (0 === $blockLevel) {
                     return $blockIndices;
                 }
             }
         }
 
-        return [];
+        return null;
     }
 }

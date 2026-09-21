@@ -25,49 +25,43 @@ use PhpCsFixer\Tokenizer\Tokens;
 
 /**
  * @author Graham Campbell <hello@gjcampbell.co.uk>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class PhpdocNoEmptyReturnFixer extends AbstractFixer
 {
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(\T_DOC_COMMENT);
+        return $tokens->isTokenKindFound(T_DOC_COMMENT);
     }
 
     public function getDefinition(): FixerDefinitionInterface
     {
         return new FixerDefinition(
-            '`@return void` and `@return null` annotations must be removed from PHPDoc.',
+            '`@return void` and `@return null` annotations should be omitted from PHPDoc.',
             [
                 new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        /**
-                         * @return null
-                        */
-                        function foo() {}
-
-                        PHP,
+                    '<?php
+/**
+ * @return null
+*/
+function foo() {}
+'
                 ),
                 new CodeSample(
-                    <<<'PHP'
-                        <?php
-                        /**
-                         * @return void
-                        */
-                        function foo() {}
-
-                        PHP,
+                    '<?php
+/**
+ * @return void
+*/
+function foo() {}
+'
                 ),
-            ],
+            ]
         );
     }
 
     /**
      * {@inheritdoc}
      *
-     * Must run before NoEmptyPhpdocFixer, PhpdocAlignFixer, PhpdocSeparationFixer, PhpdocTrimFixer.
+     * Must run before NoEmptyPhpdocFixer, PhpdocAlignFixer, PhpdocOrderFixer, PhpdocSeparationFixer, PhpdocTrimFixer.
      * Must run after AlignMultilineCommentFixer, CommentToPhpdocFixer, PhpdocIndentFixer, PhpdocScalarFixer, PhpdocToCommentFixer, PhpdocTypesFixer, VoidReturnFixer.
      */
     public function getPriority(): int
@@ -78,7 +72,7 @@ final class PhpdocNoEmptyReturnFixer extends AbstractFixer
     protected function applyFix(\SplFileInfo $file, Tokens $tokens): void
     {
         foreach ($tokens as $index => $token) {
-            if (!$token->isGivenKind(\T_DOC_COMMENT)) {
+            if (!$token->isGivenKind(T_DOC_COMMENT)) {
                 continue;
             }
 
@@ -105,7 +99,7 @@ final class PhpdocNoEmptyReturnFixer extends AbstractFixer
                 continue;
             }
 
-            $tokens[$index] = new Token([\T_DOC_COMMENT, $doc->getContent()]);
+            $tokens[$index] = new Token([T_DOC_COMMENT, $doc->getContent()]);
         }
     }
 

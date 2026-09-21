@@ -21,19 +21,21 @@ use PhpCsFixer\Tokenizer\Tokens;
  * @author Kuba Werłos <werlos@gmail.com>
  *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class BlocksAnalyzer
 {
-    public function isBlock(Tokens $tokens, int $openIndex, int $closeIndex): bool
+    public function isBlock(Tokens $tokens, ?int $openIndex, ?int $closeIndex): bool
     {
+        if (null === $openIndex || null === $closeIndex) {
+            return false;
+        }
+
         if (!$tokens->offsetExists($openIndex)) {
-            throw new \InvalidArgumentException(\sprintf('Tokex index %d for potential block opening does not exist.', $openIndex));
+            return false;
         }
 
         if (!$tokens->offsetExists($closeIndex)) {
-            throw new \InvalidArgumentException(\sprintf('Token index %d for potential block closure does not exist.', $closeIndex));
+            return false;
         }
 
         $blockType = $this->getBlockType($tokens[$openIndex]);

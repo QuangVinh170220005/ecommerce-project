@@ -50,7 +50,7 @@ class DownloadFile extends CommandAbstract
         $response->headers->set('Pragma', 'public');
         $response->headers->set('Expires', '0');
 
-        if ('text' === $request->query->get('format')) {
+        if ('text' === $request->get('format')) {
             $response->headers->set('Content-Type', 'text/plain; charset=utf-8');
         } else {
             $userAgent = !empty($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : '';

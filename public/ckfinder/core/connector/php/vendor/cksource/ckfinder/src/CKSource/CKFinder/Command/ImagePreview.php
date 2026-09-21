@@ -40,7 +40,7 @@ class ImagePreview extends CommandAbstract
     public function execute(Request $request, Config $config, WorkingFolder $workingFolder, ResizedImageRepository $resizedImageRepository, CacheManager $cache)
     {
         $fileName = (string) $request->query->get('fileName');
-        list($requestedWidth, $requestedHeight) = Image::parseSize((string) $request->query->get('size'));
+        list($requestedWidth, $requestedHeight) = Image::parseSize((string) $request->get('size'));
 
         $downloadedFile = new DownloadedFile($fileName, $this->app);
         $downloadedFile->isValid();

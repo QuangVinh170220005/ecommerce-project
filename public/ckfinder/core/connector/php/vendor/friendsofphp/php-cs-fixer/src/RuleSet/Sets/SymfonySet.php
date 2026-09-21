@@ -14,21 +14,19 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\RuleSet\Sets;
 
-use PhpCsFixer\Fixer\Phpdoc\PhpdocSeparationFixer;
-use PhpCsFixer\RuleSet\AbstractRuleSetDefinition;
+use PhpCsFixer\RuleSet\AbstractRuleSetDescription;
 
 /**
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
-final class SymfonySet extends AbstractRuleSetDefinition
+final class SymfonySet extends AbstractRuleSetDescription
 {
     public function getRules(): array
     {
         return [
-            '@PER-CS3x0' => true,
+            '@PSR12' => true,
             'align_multiline_comment' => true,
+            'array_syntax' => true,
             'backtick_to_shell_exec' => true,
             'binary_operator_spaces' => true,
             'blank_line_before_statement' => [
@@ -40,6 +38,7 @@ final class SymfonySet extends AbstractRuleSetDefinition
                 'allow_single_line_anonymous_functions' => true,
                 'allow_single_line_empty_anonymous_classes' => true,
             ],
+            'cast_spaces' => true,
             'class_attributes_separation' => [
                 'elements' => [
                     'method' => 'one',
@@ -50,15 +49,12 @@ final class SymfonySet extends AbstractRuleSetDefinition
             ],
             'class_reference_name_casing' => true,
             'clean_namespace' => true,
-            'concat_space' => true, // overrides @PER-CS2.0
+            'concat_space' => true,
             'declare_parentheses' => true,
             'echo_tag_syntax' => true,
             'empty_loop_body' => ['style' => 'braces'],
             'empty_loop_condition' => true,
             'fully_qualified_strict_types' => true,
-            'function_declaration' => [ // overrides @PER-CS2.0
-                'closure_fn_spacing' => 'one', // @TODO: default value of this option changed, consider to switch to new default
-            ],
             'general_phpdoc_tag_rename' => [
                 'replacements' => [
                     'inheritDocs' => 'inheritDoc',
@@ -74,10 +70,10 @@ final class SymfonySet extends AbstractRuleSetDefinition
             'integer_literal_case' => true,
             'lambda_not_used_import' => true,
             'linebreak_after_opening_tag' => true,
+            'long_to_shorthand_operator' => true,
             'magic_constant_casing' => true,
             'magic_method_casing' => true,
-            'method_argument_space' => [ // overrides @PER-CS2.0
-                'after_heredoc' => true,
+            'method_argument_space' => [
                 'on_multiline' => 'ignore',
             ],
             'native_function_casing' => true,
@@ -112,7 +108,6 @@ final class SymfonySet extends AbstractRuleSetDefinition
             'no_singleline_whitespace_before_semicolons' => true,
             'no_spaces_around_offset' => true,
             'no_superfluous_phpdoc_tags' => [
-                'allow_hidden_params' => true,
                 'remove_inheritdoc' => true,
             ],
             'no_trailing_comma_in_singleline' => true,
@@ -137,9 +132,9 @@ final class SymfonySet extends AbstractRuleSetDefinition
             'no_unused_imports' => true,
             'no_useless_concat_operator' => true,
             'no_useless_nullsafe_operator' => true,
-            'no_whitespace_before_comma_in_array' => ['after_heredoc' => true],
+            'no_whitespace_before_comma_in_array' => true,
             'normalize_index_brace' => true,
-            'nullable_type_declaration_for_default_null_value' => true,
+            'nullable_type_declaration_for_default_null_value' => ['use_nullable_type_declaration' => false],
             'object_operator_without_whitespace' => true,
             'operator_linebreak' => [
                 'only_booleans' => true,
@@ -159,15 +154,7 @@ final class SymfonySet extends AbstractRuleSetDefinition
             'phpdoc_indent' => true,
             'phpdoc_inline_tag_normalizer' => true,
             'phpdoc_no_access' => true,
-            'phpdoc_no_alias_tag' => [
-                'replacements' => [
-                    'const' => 'var', // @TODO 4.0 add to @PhpdocNoAliasTagFixer defaults
-                    'link' => 'see',
-                    'property-read' => 'property',
-                    'property-write' => 'property',
-                    'type' => 'var',
-                ],
-            ],
+            'phpdoc_no_alias_tag' => true,
             'phpdoc_no_package' => true,
             'phpdoc_no_useless_inheritdoc' => true,
             'phpdoc_order' => [
@@ -178,26 +165,8 @@ final class SymfonySet extends AbstractRuleSetDefinition
                 ],
             ],
             'phpdoc_return_self_reference' => true,
-            'phpdoc_scalar' => [
-                'types' => [ // @TODO v4 drop custom config with => true, as v4 defaults are same
-                    'boolean',
-                    'callback',
-                    'double',
-                    'integer',
-                    'never-return',
-                    'never-returns',
-                    'no-return',
-                    'real',
-                    'str',
-                ],
-            ],
-            'phpdoc_separation' => [
-                'groups' => [
-                    ['Annotation', 'NamedArgumentConstructor', 'Target'],
-                    ...PhpdocSeparationFixer::OPTION_GROUPS_DEFAULT,
-                ],
-                'skip_unlisted_annotations' => false, // @TODO: default value of this option changed, consider to switch to new default
-            ],
+            'phpdoc_scalar' => true,
+            'phpdoc_separation' => true,
             'phpdoc_single_line_var_spacing' => true,
             'phpdoc_summary' => true,
             'phpdoc_tag_type' => [
@@ -205,9 +174,7 @@ final class SymfonySet extends AbstractRuleSetDefinition
                     'inheritDoc' => 'inline',
                 ],
             ],
-            'phpdoc_to_comment' => [
-                'allow_before_return_statement' => false, // @TODO: default value of this option changed, consider to switch to new default
-            ],
+            'phpdoc_to_comment' => true,
             'phpdoc_trim' => true,
             'phpdoc_trim_consecutive_blank_line_separation' => true,
             'phpdoc_types' => true,
@@ -215,10 +182,10 @@ final class SymfonySet extends AbstractRuleSetDefinition
                 'null_adjustment' => 'always_last',
                 'sort_algorithm' => 'none',
             ],
-            'phpdoc_var_annotation_correct_order' => true,
             'phpdoc_var_without_name' => true,
             'semicolon_after_instruction' => true,
             'simple_to_complex_string_variable' => true,
+            'single_class_element_per_statement' => true,
             'single_import_per_statement' => true,
             'single_line_comment_spacing' => true,
             'single_line_comment_style' => [
@@ -226,7 +193,6 @@ final class SymfonySet extends AbstractRuleSetDefinition
                     'hash',
                 ],
             ],
-            'single_line_empty_body' => false, // overrides @PER-CS2.0
             'single_line_throw' => true,
             'single_quote' => true,
             'single_space_around_construct' => true,
@@ -235,23 +201,11 @@ final class SymfonySet extends AbstractRuleSetDefinition
             ],
             'standardize_increment' => true,
             'standardize_not_equals' => true,
-            'statement_indentation' => [
-                'stick_comment_to_next_continuous_control_statement' => true,
-            ],
             'switch_continue_to_break' => true,
-            'trailing_comma_in_multiline' => [
-                'after_heredoc' => true,
-                'elements' => [ // explicitly omit 'arguments'
-                    'array_destructuring',
-                    'arrays',
-                    'match',
-                    'parameters',
-                ],
-            ],
+            'trailing_comma_in_multiline' => true,
             'trim_array_spaces' => true,
-            'type_declaration_spaces' => [
-                'elements' => ['function', 'property'], // @TODO v4.0 and before consider to add 'constant' (default value)
-            ],
+            'type_declaration_spaces' => true,
+            'types_spaces' => true,
             'unary_operator_spaces' => true,
             'whitespace_after_comma_in_array' => true,
             'yoda_style' => true,
@@ -260,6 +214,6 @@ final class SymfonySet extends AbstractRuleSetDefinition
 
     public function getDescription(): string
     {
-        return 'Rules that follow the official `Symfony Coding Standards <https://symfony.com/doc/current/contributing/code/standards.html>`_. Extends ``@PER-CS``.';
+        return 'Rules that follow the official `Symfony Coding Standards <https://symfony.com/doc/current/contributing/code/standards.html>`_.';
     }
 }

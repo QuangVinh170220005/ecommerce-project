@@ -122,9 +122,11 @@ class ExceptionHandler implements EventSubscriberInterface
     /**
      * Returns all events and callbacks.
      *
+     * @see <a href="http://api.symfony.com/2.5/Symfony/Component/EventDispatcher/EventSubscriberInterface.html">EventSubscriberInterface</a>
+     *
      * @return array
      */
-    public static function getSubscribedEvents(): array
+    public static function getSubscribedEvents()
     {
         return [KernelEvents::EXCEPTION => ['onCKFinderError', -255]];
     }

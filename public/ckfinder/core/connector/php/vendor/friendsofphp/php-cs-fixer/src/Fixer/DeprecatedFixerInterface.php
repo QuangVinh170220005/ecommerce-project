@@ -16,15 +16,13 @@ namespace PhpCsFixer\Fixer;
 
 /**
  * @author Kuba Werłos <werlos@gmail.com>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 interface DeprecatedFixerInterface extends FixerInterface
 {
     /**
      * Returns names of fixers to use instead, if any.
      *
-     * @return list<string>
+     * @return string[]
      */
     public function getSuccessorsNames(): array;
 }

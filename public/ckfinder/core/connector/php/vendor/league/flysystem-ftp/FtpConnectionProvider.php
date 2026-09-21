@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace League\Flysystem\Ftp;
 
 use const FTP_USEPASVADDRESS;
-use function error_clear_last;
-use function error_get_last;
 
 class FtpConnectionProvider implements ConnectionProvider
 {
@@ -30,7 +28,7 @@ class FtpConnectionProvider implements ConnectionProvider
             $this->ignorePassiveAddress($options, $connection);
             $this->makeConnectionPassive($options, $connection);
         } catch (FtpConnectionException $exception) {
-            @ftp_close($connection);
+            ftp_close($connection);
             throw $exception;
         }
 
@@ -42,11 +40,10 @@ class FtpConnectionProvider implements ConnectionProvider
      */
     private function createConnectionResource(string $host, int $port, int $timeout, bool $ssl)
     {
-        error_clear_last();
         $connection = $ssl ? @ftp_ssl_connect($host, $port, $timeout) : @ftp_connect($host, $port, $timeout);
 
         if ($connection === false) {
-            throw UnableToConnectToFtpHost::forHost($host, $port, $ssl, error_get_last()['message'] ?? '');
+            throw UnableToConnectToFtpHost::forHost($host, $port, $ssl);
         }
 
         return $connection;

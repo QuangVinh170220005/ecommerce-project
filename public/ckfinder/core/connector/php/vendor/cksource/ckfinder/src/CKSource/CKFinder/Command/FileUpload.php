@@ -50,7 +50,7 @@ class FileUpload extends CommandAbstract
     public function execute(Request $request, WorkingFolder $workingFolder, EventDispatcher $dispatcher, Config $config, CacheManager $cache, ThumbnailRepository $thumbsRepository)
     {
         // #111 IE9 download JSON issue workaround
-        if ($request->query->get('asPlainText')) {
+        if ($request->get('asPlainText')) {
             $uploadEvents = [
                 CKFinderEvent::AFTER_COMMAND_FILE_UPLOAD,
                 CKFinderEvent::AFTER_COMMAND_QUICK_UPLOAD,

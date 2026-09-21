@@ -20,8 +20,6 @@ use Symfony\Component\Finder\Finder as SymfonyFinder;
  * @author Boris Gorbylev <ekho@ekho.name>
  *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class ReporterFactory
 {
@@ -30,7 +28,7 @@ final class ReporterFactory
 
     public function registerBuiltInReporters(): self
     {
-        /** @var null|list<class-string<ReporterInterface>> $builtInReporters */
+        /** @var null|list<string> $builtInReporters */
         static $builtInReporters;
 
         if (null === $builtInReporters) {
@@ -38,15 +36,12 @@ final class ReporterFactory
 
             foreach (SymfonyFinder::create()->files()->name('*Reporter.php')->in(__DIR__) as $file) {
                 $relativeNamespace = $file->getRelativePath();
-
-                /** @var class-string<ReporterInterface> $class */
-                $class = \sprintf(
-                    '%s\%s%s',
+                $builtInReporters[] = sprintf(
+                    '%s\\%s%s',
                     __NAMESPACE__,
                     '' !== $relativeNamespace ? $relativeNamespace.'\\' : '',
-                    $file->getBasename('.php'),
+                    $file->getBasename('.php')
                 );
-                $builtInReporters[] = $class;
             }
         }
 
@@ -65,7 +60,7 @@ final class ReporterFactory
         $format = $reporter->getFormat();
 
         if (isset($this->reporters[$format])) {
-            throw new \UnexpectedValueException(\sprintf('Reporter for format "%s" is already registered.', $format));
+            throw new \UnexpectedValueException(sprintf('Reporter for format "%s" is already registered.', $format));
         }
 
         $this->reporters[$format] = $reporter;
@@ -87,7 +82,7 @@ final class ReporterFactory
     public function getReporter(string $format): ReporterInterface
     {
         if (!isset($this->reporters[$format])) {
-            throw new \UnexpectedValueException(\sprintf('Reporter for format "%s" is not registered.', $format));
+            throw new \UnexpectedValueException(sprintf('Reporter for format "%s" is not registered.', $format));
         }
 
         return $this->reporters[$format];

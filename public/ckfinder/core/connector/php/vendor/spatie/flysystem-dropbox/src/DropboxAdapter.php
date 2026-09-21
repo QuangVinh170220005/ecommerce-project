@@ -2,20 +2,18 @@
 
 namespace Spatie\FlysystemDropbox;
 
-use Generator;
-use League\Flysystem\ChecksumProvider;
+use League\Flysystem;
 use League\Flysystem\Config;
 use League\Flysystem\DirectoryAttributes;
 use League\Flysystem\FileAttributes;
-use League\Flysystem\FilesystemAdapter;
+use League\Flysystem\FilesystemException;
 use League\Flysystem\PathPrefixer;
 use League\Flysystem\StorageAttributes;
+use League\Flysystem\UnableToCheckExistence;
 use League\Flysystem\UnableToCopyFile;
 use League\Flysystem\UnableToCreateDirectory;
-use League\Flysystem\UnableToDeleteDirectory;
 use League\Flysystem\UnableToDeleteFile;
 use League\Flysystem\UnableToMoveFile;
-use League\Flysystem\UnableToProvideChecksum;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\UnableToRetrieveMetadata;
 use League\Flysystem\UnableToSetVisibility;
@@ -25,22 +23,25 @@ use League\MimeTypeDetection\MimeTypeDetector;
 use Spatie\Dropbox\Client;
 use Spatie\Dropbox\Exceptions\BadRequest;
 
-class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
+class DropboxAdapter implements Flysystem\FilesystemAdapter
 {
-    protected Client $client;
+    /** @var \Spatie\Dropbox\Client */
+    protected $client;
 
-    protected PathPrefixer $prefixer;
+    /** @var \League\Flysystem\PathPrefixer */
+    protected $prefixer;
 
-    protected MimeTypeDetector $mimeTypeDetector;
+    /** @var \League\MimeTypeDetection\MimeTypeDetector */
+    protected $mimeTypeDetector;
 
     public function __construct(
         Client $client,
         string $prefix = '',
-        ?MimeTypeDetector $mimeTypeDetector = null
+        MimeTypeDetector $mimeTypeDetector = null
     ) {
         $this->client = $client;
         $this->prefixer = new PathPrefixer($prefix);
-        $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector;
+        $this->mimeTypeDetector = $mimeTypeDetector ?: new FinfoMimeTypeDetector();
     }
 
     public function getClient(): Client
@@ -53,29 +54,21 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
         $location = $this->applyPathPrefix($path);
 
         try {
-            $meta = $this->client->getMetadata($location);
+            $this->client->getMetadata($location);
 
-            return $meta['.tag'] === 'file';
-        } catch (BadRequest) {
+            return true;
+        } catch (BadRequest $exception) {
             return false;
         }
     }
 
     public function directoryExists(string $path): bool
     {
-        $location = $this->applyPathPrefix($path);
-
-        try {
-            $meta = $this->client->getMetadata($location);
-
-            return $meta['.tag'] === 'folder';
-        } catch (BadRequest) {
-            return false;
-        }
+        return $this->fileExists($path);
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function write(string $path, string $contents, Config $config): void
     {
@@ -83,13 +76,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $this->client->upload($location, $contents, 'overwrite');
-        } catch (BadRequest $exception) {
-            throw UnableToWriteFile::atLocation($location, $exception->getMessage(), $exception);
+        } catch (BadRequest $e) {
+            throw UnableToWriteFile::atLocation($location, $e->getMessage(), $e);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function writeStream(string $path, $contents, Config $config): void
     {
@@ -97,13 +90,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $this->client->upload($location, $contents, 'overwrite');
-        } catch (BadRequest $exception) {
-            throw UnableToWriteFile::atLocation($location, $exception->getMessage(), $exception);
+        } catch (BadRequest $e) {
+            throw UnableToWriteFile::atLocation($location, $e->getMessage(), $e);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function read(string $path): string
     {
@@ -111,14 +104,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         $contents = stream_get_contents($object);
         fclose($object);
-
         unset($object);
 
         return $contents;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function readStream(string $path)
     {
@@ -126,15 +118,15 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $stream = $this->client->download($location);
-        } catch (BadRequest $exception) {
-            throw UnableToReadFile::fromLocation($location, $exception->getMessage(), $exception);
+        } catch (BadRequest $e) {
+            throw UnableToReadFile::fromLocation($location, $e->getMessage(), $e);
         }
 
         return $stream;
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function delete(string $path): void
     {
@@ -142,13 +134,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $this->client->delete($location);
-        } catch (BadRequest $exception) {
-            throw UnableToDeleteFile::atLocation($location, $exception->getMessage(), $exception);
+        } catch (BadRequest $e) {
+            throw UnableToDeleteFile::atLocation($location, $e->getMessage(), $e);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function deleteDirectory(string $path): void
     {
@@ -156,13 +148,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $this->client->delete($location);
-        } catch (UnableToDeleteFile $exception) {
-            throw UnableToDeleteDirectory::atLocation($location, $exception->getPrevious()->getMessage(), $exception);
+        } catch (UnableToDeleteFile $e) {
+            throw Flysystem\UnableToDeleteDirectory::atLocation($location, $e->getPrevious()->getMessage(), $e);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function createDirectory(string $path, Config $config): void
     {
@@ -170,13 +162,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $this->client->createFolder($location);
-        } catch (BadRequest $exception) {
-            throw UnableToCreateDirectory::atLocation($location, $exception->getMessage());
+        } catch (BadRequest $e) {
+            throw UnableToCreateDirectory::atLocation($location, $e->getMessage());
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function setVisibility(string $path, string $visibility): void
     {
@@ -184,7 +176,7 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function visibility(string $path): FileAttributes
     {
@@ -193,7 +185,7 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function mimeType(string $path): FileAttributes
     {
@@ -207,7 +199,7 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function lastModified(string $path): FileAttributes
     {
@@ -215,8 +207,8 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $response = $this->client->getMetadata($location);
-        } catch (BadRequest $exception) {
-            throw UnableToRetrieveMetadata::lastModified($location, $exception->getMessage());
+        } catch (BadRequest $e) {
+            throw UnableToRetrieveMetadata::lastModified($location, $e->getMessage());
         }
 
         $timestamp = (isset($response['server_modified'])) ? strtotime($response['server_modified']) : null;
@@ -230,37 +222,7 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
     }
 
     /**
-     * {@inheritDoc}
-     */
-    public function checksum(string $path, Config $config): string
-    {
-        $algo = $config->get('checksum_algo', 'sha256');
-        $location = $this->applyPathPrefix($path);
-
-        try {
-            $response = $this->client->getMetadata($location);
-        } catch (BadRequest $exception) {
-            throw new UnableToProvideChecksum(
-                reason: 'Unable to retrieve metadata.',
-                path: $path,
-                previous: $exception,
-            );
-        }
-
-        if (empty($response['content_hash'])) {
-            throw new UnableToProvideChecksum(
-                reason: 'Content-Hash not provided by Dropbox metadata.',
-                path: $path,
-            );
-        }
-
-        return $algo === 'sha256'
-            ? $response['content_hash']
-            : hash($algo, $response['content_hash']);
-    }
-
-    /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function fileSize(string $path): FileAttributes
     {
@@ -268,8 +230,8 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $response = $this->client->getMetadata($location);
-        } catch (BadRequest $exception) {
-            throw UnableToRetrieveMetadata::lastModified($location, $exception->getMessage());
+        } catch (BadRequest $e) {
+            throw UnableToRetrieveMetadata::lastModified($location, $e->getMessage());
         }
 
         return new FileAttributes(
@@ -295,13 +257,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
         }
     }
 
-    protected function iterateFolderContents(string $path = '', bool $deep = false): Generator
+    protected function iterateFolderContents(string $path = '', bool $deep = false): \Generator
     {
         $location = $this->applyPathPrefix($path);
 
         try {
             $result = $this->client->listFolder($location, $deep);
-        } catch (BadRequest $exception) {
+        } catch (BadRequest $e) {
             return;
         }
 
@@ -339,7 +301,7 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function move(string $source, string $destination, Config $config): void
     {
@@ -348,13 +310,13 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
 
         try {
             $this->client->move($path, $newPath);
-        } catch (BadRequest $exception) {
-            throw UnableToMoveFile::fromLocationTo($path, $newPath, $exception);
+        } catch (BadRequest $e) {
+            throw UnableToMoveFile::fromLocationTo($path, $newPath, $e);
         }
     }
 
     /**
-     * {@inheritDoc}
+     * @inheritDoc
      */
     public function copy(string $source, string $destination, Config $config): void
     {
@@ -372,7 +334,8 @@ class DropboxAdapter implements ChecksumProvider, FilesystemAdapter
     {
         return '/'.trim($this->prefixer->prefixPath($path), '/');
     }
-
+    
+    
     public function getUrl(string $path): string
     {
         return $this->client->getTemporaryLink($path);

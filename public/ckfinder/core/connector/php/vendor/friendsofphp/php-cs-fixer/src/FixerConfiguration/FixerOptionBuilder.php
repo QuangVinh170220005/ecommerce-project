@@ -14,9 +14,6 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\FixerConfiguration;
 
-/**
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
- */
 final class FixerOptionBuilder
 {
     private string $name;
@@ -24,7 +21,7 @@ final class FixerOptionBuilder
     private string $description;
 
     /**
-     * @var null|mixed
+     * @var mixed
      */
     private $default;
 
@@ -33,22 +30,27 @@ final class FixerOptionBuilder
     /**
      * @var null|list<string>
      */
-    private ?array $allowedTypes = null;
+    private $allowedTypes;
 
     /**
-     * @var null|non-empty-list<null|(callable(mixed): bool)|scalar>
+     * @var null|list<null|(callable(mixed): bool)|scalar>
      */
-    private ?array $allowedValues = null;
+    private $allowedValues;
 
-    private ?\Closure $normalizer = null;
+    /**
+     * @var null|\Closure
+     */
+    private $normalizer;
 
-    private ?string $deprecationMessage = null;
+    /**
+     * @var null|string
+     */
+    private $deprecationMessage;
 
     public function __construct(string $name, string $description)
     {
         $this->name = $name;
         $this->description = $description;
-        $this->default = null;
     }
 
     /**
@@ -77,7 +79,7 @@ final class FixerOptionBuilder
     }
 
     /**
-     * @param non-empty-list<null|(callable(mixed): bool)|scalar> $allowedValues
+     * @param list<null|(callable(mixed): bool)|scalar> $allowedValues
      *
      * @return $this
      */
@@ -117,7 +119,7 @@ final class FixerOptionBuilder
             $this->default,
             $this->allowedTypes,
             $this->allowedValues,
-            $this->normalizer,
+            $this->normalizer
         );
 
         if (null !== $this->deprecationMessage) {

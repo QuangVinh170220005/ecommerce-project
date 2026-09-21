@@ -21,11 +21,10 @@
     ],
     "require": {
         "php": "^8.0",
-        "league/flysystem": "^3.7.0",
+        "league/flysystem": "^2.0.4 || ^3.0.0",
         "spatie/dropbox-api": "^1.17.1"
     },
     "require-dev": {
-        "pestphp/pest": "^1.22",
         "phpspec/prophecy-phpunit": "^2.0.1",
         "phpunit/phpunit": "^9.5.4"
     },
@@ -43,9 +42,6 @@
         "test": "vendor/bin/phpunit"
     },
     "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "pestphp/pest-plugin": true
-        }
+        "sort-packages": true
     }
 }

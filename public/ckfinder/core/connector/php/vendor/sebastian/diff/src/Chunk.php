@@ -9,28 +9,14 @@
  */
 namespace SebastianBergmann\Diff;
 
-use ArrayIterator;
-use IteratorAggregate;
-use Traversable;
-
-/**
- * @template-implements IteratorAggregate<int, Line>
- */
-final class Chunk implements IteratorAggregate
+final class Chunk
 {
     private int $start;
     private int $startRange;
     private int $end;
     private int $endRange;
-
-    /**
-     * @var list<Line>
-     */
     private array $lines;
 
-    /**
-     * @param list<Line> $lines
-     */
     public function __construct(int $start = 0, int $startRange = 1, int $end = 0, int $endRange = 1, array $lines = [])
     {
         $this->start      = $start;
@@ -40,44 +26,45 @@ final class Chunk implements IteratorAggregate
         $this->lines      = $lines;
     }
 
-    public function start(): int
+    public function getStart(): int
     {
         return $this->start;
     }
 
-    public function startRange(): int
+    public function getStartRange(): int
     {
         return $this->startRange;
     }
 
-    public function end(): int
+    public function getEnd(): int
     {
         return $this->end;
     }
 
-    public function endRange(): int
+    public function getEndRange(): int
     {
         return $this->endRange;
     }
 
     /**
-     * @return list<Line>
+     * @psalm-return list<Line>
      */
-    public function lines(): array
+    public function getLines(): array
     {
         return $this->lines;
     }
 
     /**
-     * @param list<Line> $lines
+     * @psalm-param list<Line> $lines
      */
     public function setLines(array $lines): void
     {
-        $this->lines = $lines;
-    }
+        foreach ($lines as $line) {
+            if (!$line instanceof Line) {
+                throw new InvalidArgumentException;
+            }
+        }
 
-    public function getIterator(): Traversable
-    {
-        return new ArrayIterator($this->lines);
+        $this->lines = $lines;
     }
 }

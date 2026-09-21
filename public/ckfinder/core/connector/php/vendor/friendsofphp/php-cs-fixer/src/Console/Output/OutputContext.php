@@ -17,11 +17,7 @@ namespace PhpCsFixer\Console\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 
 /**
- * @readonly
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class OutputContext
 {

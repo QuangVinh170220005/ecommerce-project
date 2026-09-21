@@ -23,7 +23,7 @@ use CKSource\CKFinder\Exception\CKFinderException;
  */
 class Image
 {
-    protected static $supportedExtensions = ['jpg', 'jpeg', 'gif', 'png', 'webp'];
+    protected static $supportedExtensions = ['jpg', 'jpeg', 'gif', 'png'];
 
     /**
      * Image width.
@@ -119,7 +119,6 @@ class Image
             'image/jpeg' => $gdSupportedTypes & IMG_JPG,
             'image/png' => $gdSupportedTypes & IMG_PNG,
             'image/wbmp' => $gdSupportedTypes & IMG_WBMP,
-            'image/webp' => $gdSupportedTypes & IMG_WEBP,
             'image/bmp' => $bmpSupport && ($gdSupportedTypes & IMG_JPG),
             'image/x-ms-bmp' => $bmpSupport && ($gdSupportedTypes & IMG_JPG),
         ];
@@ -144,7 +143,7 @@ class Image
     public function __destruct()
     {
         if ($this->hasValidGdImage()) {
-            unset($this->gdImage);
+            imagedestroy($this->gdImage);
         }
     }
 
@@ -220,7 +219,6 @@ class Image
             'bmp' => 'image/bmp',
             'png' => 'image/png',
             'wbmp' => 'image/wbmp',
-            'webp' => 'image/webp',
         ];
 
         $extension = strtolower($extension);
@@ -503,7 +501,7 @@ class Image
 
         $targetImage = imagecreatetruecolor($targetWidth, $targetHeight);
 
-        if (in_array($this->mime, ['image/png', 'image/webp'])) {
+        if ('image/png' === $this->mime) {
             $bg = imagecolorallocatealpha($targetImage, 255, 255, 255, 127);
             imagefill($targetImage, 0, 0, $bg);
             imagealphablending($targetImage, false);
@@ -571,13 +569,6 @@ class Image
                 imagewbmp($this->gdImage);
 
                 break;
-
-            case 'image/webp':
-                imagealphablending($this->gdImage, false);
-                imagesavealpha($this->gdImage, true);
-                imagewebp($this->gdImage);
-
-                break;
         }
 
         $this->dataSize = ob_get_length();
@@ -639,7 +630,7 @@ class Image
     {
         $targetImage = imagecreatetruecolor($width, $height);
 
-        if (in_array($this->mime, ['image/png', 'image/webp'])) {
+        if ('image/png' === $this->mime) {
             $bg = imagecolorallocatealpha($targetImage, 255, 255, 255, 127);
             imagefill($targetImage, 0, 0, $bg);
             imagealphablending($targetImage, false);
@@ -648,7 +639,7 @@ class Image
 
         imagecopy($targetImage, $this->gdImage, 0, 0, $x, $y, $width, $height);
 
-        unset($this->gdImage);
+        imagedestroy($this->gdImage);
         $this->gdImage = $targetImage;
         $this->width = $width;
         $this->height = $height;
@@ -658,7 +649,7 @@ class Image
 
     public function rotate($degrees, $bgcolor = 0)
     {
-        if (in_array($this->mime, ['image/png', 'image/webp'])) {
+        if ('image/png' === $this->mime) {
             imagesavealpha($this->gdImage, true);
             $bgcolor = imagecolorallocatealpha($this->gdImage, 0, 0, 0, 127);
         }

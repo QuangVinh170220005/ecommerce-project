@@ -21,16 +21,17 @@ use PhpCsFixer\Tokenizer\Tokens;
  * @internal
  *
  * @author Vladimir Reznichenko <kalessil@gmail.com>
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 abstract class AbstractFunctionReferenceFixer extends AbstractFixer
 {
-    private ?FunctionsAnalyzer $functionsAnalyzer = null;
+    /**
+     * @var null|FunctionsAnalyzer
+     */
+    private $functionsAnalyzer;
 
     public function isCandidate(Tokens $tokens): bool
     {
-        return $tokens->isTokenKindFound(\T_STRING);
+        return $tokens->isTokenKindFound(T_STRING);
     }
 
     public function isRisky(): bool
@@ -42,7 +43,7 @@ abstract class AbstractFunctionReferenceFixer extends AbstractFixer
      * Looks up Tokens sequence for suitable candidates and delivers boundaries information,
      * which can be supplied by other methods in this abstract class.
      *
-     * @return ?array{int, int, int} returns $functionName, $openParenthesis, $closeParenthesis packed into array
+     * @return null|int[] returns $functionName, $openParenthesis, $closeParenthesis packed into array
      */
     protected function find(string $functionNameToSearch, Tokens $tokens, int $start = 0, ?int $end = null): ?array
     {
@@ -54,7 +55,7 @@ abstract class AbstractFunctionReferenceFixer extends AbstractFixer
         $end ??= $tokens->count();
 
         // find raw sequence which we can analyse for context
-        $candidateSequence = [[\T_STRING, $functionNameToSearch], '('];
+        $candidateSequence = [[T_STRING, $functionNameToSearch], '('];
         $matches = $tokens->findSequence($candidateSequence, $start, $end, false);
 
         if (null === $matches) {

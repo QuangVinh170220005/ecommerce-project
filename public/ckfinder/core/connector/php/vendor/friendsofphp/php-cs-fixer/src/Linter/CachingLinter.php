@@ -14,14 +14,10 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Linter;
 
-use PhpCsFixer\Hasher;
-
 /**
  * @author Dariusz Rumiński <dariusz.ruminski@gmail.com>
  *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class CachingLinter implements LinterInterface
 {
@@ -44,15 +40,23 @@ final class CachingLinter implements LinterInterface
 
     public function lintFile(string $path): LintingResultInterface
     {
-        $checksum = Hasher::calculate(file_get_contents($path));
+        $checksum = md5(file_get_contents($path));
 
-        return $this->cache[$checksum] ??= $this->sublinter->lintFile($path);
+        if (!isset($this->cache[$checksum])) {
+            $this->cache[$checksum] = $this->sublinter->lintFile($path);
+        }
+
+        return $this->cache[$checksum];
     }
 
     public function lintSource(string $source): LintingResultInterface
     {
-        $checksum = Hasher::calculate($source);
+        $checksum = md5($source);
 
-        return $this->cache[$checksum] ??= $this->sublinter->lintSource($source);
+        if (!isset($this->cache[$checksum])) {
+            $this->cache[$checksum] = $this->sublinter->lintSource($source);
+        }
+
+        return $this->cache[$checksum];
     }
 }

@@ -14,17 +14,12 @@ declare(strict_types=1);
 
 namespace PhpCsFixer\Console\Report\FixReport;
 
-use PhpCsFixer\Console\Application;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 
 /**
  * @author Kévin Gomez <contact@kevingomez.fr>
  *
- * @readonly
- *
  * @internal
- *
- * @no-named-arguments Parameter names are not covered by the backward compatibility promise.
  */
 final class CheckstyleReporter implements ReporterInterface
 {
@@ -40,16 +35,11 @@ final class CheckstyleReporter implements ReporterInterface
         }
 
         $dom = new \DOMDocument('1.0', 'UTF-8');
-
         $checkstyles = $dom->appendChild($dom->createElement('checkstyle'));
-        \assert($checkstyles instanceof \DOMElement);
-
-        $checkstyles->setAttribute('version', Application::getAbout());
 
         foreach ($reportSummary->getChanged() as $filePath => $fixResult) {
+            /** @var \DOMElement $file */
             $file = $checkstyles->appendChild($dom->createElement('file'));
-            \assert($file instanceof \DOMElement);
-
             $file->setAttribute('name', $filePath);
 
             foreach ($fixResult['appliedFixers'] as $appliedFixer) {
@@ -60,12 +50,7 @@ final class CheckstyleReporter implements ReporterInterface
 
         $dom->formatOutput = true;
 
-        $result = $dom->saveXML();
-        if (false === $result) {
-            throw new \RuntimeException('Failed to generate XML output');
-        }
-
-        return $reportSummary->isDecoratedOutput() ? OutputFormatter::escape($result) : $result;
+        return $reportSummary->isDecoratedOutput() ? OutputFormatter::escape($dom->saveXML()) : $dom->saveXML();
     }
 
     private function createError(\DOMDocument $dom, string $appliedFixer): \DOMElement

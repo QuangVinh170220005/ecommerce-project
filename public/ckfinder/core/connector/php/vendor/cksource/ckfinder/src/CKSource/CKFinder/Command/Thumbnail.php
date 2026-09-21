@@ -39,7 +39,7 @@ class Thumbnail extends CommandAbstract
             throw new CKFinderException('Thumbnails feature is disabled', Error::THUMBNAILS_DISABLED);
         }
 
-        $fileName = (string) $request->query->get('fileName');
+        $fileName = (string) $request->get('fileName');
 
         $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
@@ -55,7 +55,7 @@ class Thumbnail extends CommandAbstract
             throw new FileNotFoundException();
         }
 
-        list($requestedWidth, $requestedHeight) = Image::parseSize((string) $request->query->get('size'));
+        list($requestedWidth, $requestedHeight) = Image::parseSize((string) $request->get('size'));
 
         $thumbnail = $thumbnailRepository->getThumbnail(
             $workingFolder->getResourceType(),

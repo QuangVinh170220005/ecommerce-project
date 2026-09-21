@@ -8,7 +8,7 @@ use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-
+//admin
 Route::get('/admin/dashboard', [DashboardController::class, 'index']);
 
 Route::get('/admin/profile', [ProfileController::class, 'getProfile']);
@@ -29,3 +29,12 @@ Route::get('admin/blog/delete/{id}', [BlogController::class, 'delete']);
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+//user
+
+Route::get('shop/register', function(){
+    return view('frontend.auth.register');
+});
+Route::get('shop/login', function(){
+    return view('frontend.auth.login');
+});
