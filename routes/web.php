@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\user\AuthController;
+use App\Http\Controllers\user\BlogController as UserBlogController;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -25,15 +26,18 @@ Route::get('/admin/blog/add', [BlogController::class, 'addBlog']);
 Route::post('/admin/blog/store', [BlogController::class, 'store']);
 Route::get('/admin/blog/edit/{id}', [BlogController::class, 'editBlog']);
 Route::post('/admin/blog/update/{id}', [BlogController::class, 'update']);
-Route::get('admin/blog/delete/{id}', [BlogController::class, 'delete']);
+Route::get('/admin/blog/delete/{id}', [BlogController::class, 'delete']);
 
 Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 //user
-
+//auth
 Route::get('/shop/register', [AuthController::class, 'register']);
 Route::post('/shop/register/create', [AuthController::class, 'handleRegister']);
 Route::get('/shop/login', [AuthController::class, 'login']);
 Route::post('/shop/handleLogin', [AuthController::class, 'handleLogin']);
+
+Route::get('/shop/blog/list', [UserBlogController::class, 'getBlog']);
+Route::get('/shop/blog/detail/{id}', [UserBlogController::class, 'getBlogDetail']);
