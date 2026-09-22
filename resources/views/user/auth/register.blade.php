@@ -1,4 +1,4 @@
-@extends('frontend.layouts.app')
+@extends('user.layouts.app')
 
 @section('content')
 
@@ -13,16 +13,16 @@
                     <h2>New User Signup!</h2>
 
                     @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
                     @endif
 
-                    <form method="POST" action="" enctype="multipart/form-data">
+                    <form method="post" action="/shop/register/create" enctype="multipart/form-data">
 
                         @csrf
 
@@ -55,16 +55,22 @@
                                 <input type="text" name="address" value="" placeholder="Address">
                             </div>
                         </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <input type="file" name="avatar" placeholder="Avatar">
+                            </div>
+                        </div>
 
                         <div class="row">
                             <div class="col-sm-6">
                                 <select name="id_country">
                                     <option value="">-- Select Country --</option>
-                                </select>
-                            </div>
 
-                            <div class="col-sm-6">
-                                <input type="file" name="avatar">
+                                    @foreach ($data as $country)
+                                    <option value="{{ $country->id }}">{{ $country->name }}</option>
+                                    @endforeach
+
+                                </select>
                             </div>
                         </div>
 

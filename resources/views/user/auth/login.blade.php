@@ -1,4 +1,4 @@
-@extends('frontend.layouts.app')
+@extends('user.layouts.app')
 
 @section('content')
 
@@ -21,29 +21,21 @@
                             </ul>
                         </div>
                     @endif
-
-                    <form method="POST" action="">
-
+                    <form method="post" action="/shop/handleLogin">
                         @csrf
-
                         <input type="email" name="email" value="{{ old('email') }}" placeholder="Email Address">
-
                         <input type="password" name="password" placeholder="Password">
-
                         <span>
-                            <input type="checkbox" name="remember" class="checkbox">
+                            <input type="checkbox" name="remember_me" class="checkbox">
                             Keep me signed in
                         </span>
-
                         <button type="submit" class="btn btn-default">
                             Login
                         </button>
-
                     </form>
-
                     <p style="margin-top: 15px;">
                         Don't have an account?
-                        <a href="">Register now</a>
+                        <a href="/shop/register">Register now</a>
                     </p>
 
                 </div>

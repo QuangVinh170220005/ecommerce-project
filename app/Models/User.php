@@ -26,6 +26,7 @@ class User extends Authenticatable
         'id_country',
         'avatar',
         'password',
+        'level',
     ];
 
     /**

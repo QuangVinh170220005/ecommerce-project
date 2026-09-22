@@ -15,9 +15,9 @@
     <link rel="shortcut icon" href="{{ asset('user/images/home/logo.png') }}">
 </head>
 <body>
-    @include('frontend.layouts.header')
+    @include('user.layouts.header')
     @yield('content')
-    @include('frontend.layouts.footer')
+    @include('user.layouts.footer')
 
     
     <script src="{{ asset('user/js/jquery.js') }}"></script>

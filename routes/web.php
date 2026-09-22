@@ -4,6 +4,7 @@ use App\Http\Controllers\admin\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\user\AuthController;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -32,9 +33,7 @@ Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name
 
 //user
 
-Route::get('shop/register', function(){
-    return view('frontend.auth.register');
-});
-Route::get('shop/login', function(){
-    return view('frontend.auth.login');
-});
+Route::get('/shop/register', [AuthController::class, 'register']);
+Route::post('/shop/register/create', [AuthController::class, 'handleRegister']);
+Route::get('/shop/login', [AuthController::class, 'login']);
+Route::post('/shop/handleLogin', [AuthController::class, 'handleLogin']);
