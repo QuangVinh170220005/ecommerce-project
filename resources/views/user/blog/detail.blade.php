@@ -153,12 +153,14 @@
                                 <li><i class="fa fa-calendar"></i> {{ $data->created_at->format('M d, Y') }}</li>
                             </ul>
                             <span>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star"></i>
-									<i class="fa fa-star-half-o"></i>
-								</span>
+                                @for($i = 1; $i <= 5; $i ++)
+                                    @if($i <= $avgRate)
+                                        <i class="fa fa-star"></i>
+                                    @else
+                                        <i class="fa fa-star-o"></i>
+                                    @endif
+                                @endfor
+                            </span>
                         </div>
                         <a href="">
                             <img src="{{ asset('admin/assets/images/blogs/' . $data->image) }}" alt="">
@@ -171,10 +173,10 @@
                         <div class="pager-area">
                             <ul class="pager pull-right">
                                 @if ($prev)
-                                    <li><a href="/shop/blog/detail/{{ $prev -> id }}">Pre</a></li>
+                                <li><a href="/shop/blog/detail/{{ $prev -> id }}">Pre</a></li>
                                 @endif
                                 @if ($next)
-                                    <li><a href="/shop/blog/detail/{{ $next -> id }}">Next</a></li>
+                                <li><a href="/shop/blog/detail/{{ $next -> id }}">Next</a></li>
                                 @endif
                             </ul>
                         </div>
@@ -185,11 +187,16 @@
                     <ul class="ratings">
                         <li class="rate-this">Rate this item:</li>
                         <li>
-                            <i class="fa fa-star color"></i>
-                            <i class="fa fa-star color"></i>
-                            <i class="fa fa-star color"></i>
-                            <i class="fa fa-star"></i>
-                            <i class="fa fa-star"></i>
+                            <div class="rate">
+                                <div class="vote" data-blog = "{{ $data -> id }}">
+                                    <div class="star_1 ratings_stars"><input value="1" type="hidden"></div>
+                                    <div class="star_2 ratings_stars"><input value="2" type="hidden"></div>
+                                    <div class="star_3 ratings_stars"><input value="3" type="hidden"></div>
+                                    <div class="star_4 ratings_stars"><input value="4" type="hidden"></div>
+                                    <div class="star_5 ratings_stars"><input value="5" type="hidden"></div>
+                                    <span class="rate-np">{{ $avgRate }}</span>
+                                </div>
+                            </div>
                         </li>
                         <li class="color">(6 votes)</li>
                     </ul>
@@ -361,4 +368,55 @@
         </div>
     </div>
 </section>
+<script>
+    $.ajaxSetup({
+    headers: {
+        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+    }
+});
+    $(document).ready(function() {
+        //vote
+        $('.ratings_stars').hover(
+            // Handles the mouseover
+            function() {
+                $(this).prevAll().andSelf().addClass('ratings_hover');
+                // $(this).nextAll().removeClass('ratings_vote'); 
+            },
+            function() {
+                $(this).prevAll().andSelf().removeClass('ratings_hover');
+                // set_votes($(this).parent());
+            }
+        );
+
+        $('.ratings_stars').click(function() {
+            var checkLogin = "{{ Auth::check() }}";
+            if (checkLogin) {
+                var rate = $(this).find("input").val();
+                var id_blog = $('.vote').data('blog');
+                if ($(this).hasClass('ratings_over')) {
+                    $('.ratings_stars').removeClass('ratings_over');
+                    $(this).prevAll().andSelf().addClass('ratings_over');
+                } else {
+                    $(this).prevAll().andSelf().addClass('ratings_over');
+                }
+                $.ajax({
+                    type: 'POST',
+                    url: '{{ url("/shop/blog/detail/rate") }}',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        rate: rate,
+                        id_blog: id_blog 
+                    },
+                    success:function(data){
+                        console.log(data);
+                    }
+                });
+            }else{
+                alert('Vui long login để rate');
+            }
+
+        });
+    });
+</script>
+
 @endsection

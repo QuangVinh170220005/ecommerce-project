@@ -4,7 +4,9 @@ namespace App\Http\Controllers\user;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Rate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class BlogController extends Controller
 {
@@ -20,7 +22,24 @@ class BlogController extends Controller
 
         $next = Blog::where('id', '>', $id)
         -> orderBy('id', 'asc') -> first();
-        
-        return view('user.blog.detail', compact('data', 'prev', 'next'));
+
+        $avgRate = round(Rate::where('id_blog', $id)-> avg('rate'));
+        return view('user.blog.detail', compact('data', 'prev', 'next', 'avgRate'));
+    }
+
+    function blogRate(Request $req){
+        $data = $req -> all();
+        $data['id_user'] = Auth::id();
+
+        Rate::updateOrCreate(
+            [
+                'id_blog' => $data['id_blog'],
+                'id_user' => $data['id_user']
+            ],
+            [
+                'rate' => $data['rate'],
+                'time' => now()
+            ]
+        );
     }
 }

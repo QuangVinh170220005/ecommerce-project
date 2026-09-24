@@ -46,7 +46,7 @@ class AuthController extends Controller
             $remember = true;
         }
         if(Auth::attempt($login, $remember)){
-            return redirect('/home')->with('success', 'Đăng nhập thành công.');
+            return redirect('/shop/blog/list')->with('success', 'Đăng nhập thành công.');
         }else{
             return redirect('/shop/login')->with('error', 'Email hoặc mật khẩu không đúng.');
         }

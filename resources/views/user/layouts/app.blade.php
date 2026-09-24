@@ -12,7 +12,10 @@
     <link href="{{ asset('user/css/animate.css') }}" rel="stylesheet">
 	<link href="{{ asset('user/css/main.css') }}" rel="stylesheet">
 	<link href="{{ asset('user/css/responsive.css') }}" rel="stylesheet">
+    <link href="{{ asset('user/css/rate.css') }}" rel="stylesheet">
     <link rel="shortcut icon" href="{{ asset('user/images/home/logo.png') }}">
+     <meta name="csrf-token" content="{{ csrf_token() }}">
+     <script src="{{ asset('user/js/jquery.js') }}"></script>
 </head>
 <body>
     @include('user.layouts.header')
@@ -20,7 +23,7 @@
     @include('user.layouts.footer')
 
     
-    <script src="{{ asset('user/js/jquery.js') }}"></script>
+    
 	<script src="{{ asset('user/js/bootstrap.min.js') }}"></script>
 	<script src="{{ asset('user/js/jquery.scrollUp.min.js') }}"></script>
 	<script src="{{ asset('user/js/price-range.js') }}"></script>
