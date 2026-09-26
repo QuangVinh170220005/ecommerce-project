@@ -23,6 +23,7 @@ class AuthController extends Controller
         $file = $req -> avatar;
         if(!empty($file)){
             $data['avatar'] = $file -> getClientOriginalName();
+            $file->move('admin/assets/images/users', $file->getClientOriginalName());
         }
         if(User::create($data)){
             return redirect('/shop/login')-> with('success', __('Create user success.'));

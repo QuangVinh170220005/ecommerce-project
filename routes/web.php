@@ -41,4 +41,5 @@ Route::post('/shop/handleLogin', [AuthController::class, 'handleLogin']);
 
 Route::get('/shop/blog/list', [UserBlogController::class, 'getBlog']);
 Route::get('/shop/blog/detail/{id}', [UserBlogController::class, 'getBlogDetail']);
-Route::post('shop/blog/detail/rate', [UserBlogController::class, 'blogRate']);
+Route::post('/shop/blog/detail/rate', [UserBlogController::class, 'blogRate']);
+Route::post('/shop/blog/detail/comment', [UserBlogController::class, 'commentBlog']);

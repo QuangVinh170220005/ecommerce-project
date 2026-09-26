@@ -4,6 +4,7 @@ namespace App\Http\Controllers\user;
 
 use App\Http\Controllers\Controller;
 use App\Models\Blog;
+use App\Models\Comment;
 use App\Models\Rate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,7 +25,13 @@ class BlogController extends Controller
         -> orderBy('id', 'asc') -> first();
 
         $avgRate = round(Rate::where('id_blog', $id)-> avg('rate'));
-        return view('user.blog.detail', compact('data', 'prev', 'next', 'avgRate'));
+        $comment = Comment::where('id_blog', $id) -> orderBy('id', 'asc')-> get();
+        
+        return view('user.blog.detail', compact('data',
+                                                                        'prev', 
+                                                                        'next', 
+                                                                        'avgRate', 
+                                                                        'comment'));
     }
 
     function blogRate(Request $req){
@@ -41,5 +48,19 @@ class BlogController extends Controller
                 'time' => now()
             ]
         );
+    }
+
+    function commentBlog(Request $req){
+        $data = $req -> all();
+        $user = Auth::user();
+
+        $data['id_user'] = $user -> id;
+        $data['avt_user'] = $user -> avatar;
+        $data['name_user'] = $user -> name;
+        $data['level'] = 0;
+        $data['time'] = now();
+        Comment::create($data);
+
+        return response() -> json(['data' => $data]);
     }
 }
