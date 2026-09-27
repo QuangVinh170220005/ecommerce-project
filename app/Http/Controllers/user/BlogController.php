@@ -63,4 +63,16 @@ class BlogController extends Controller
 
         return response() -> json(['data' => $data]);
     }
+
+    function replyCmt(Request $req){
+        $data = $req -> all();
+        $user = Auth::user();
+
+        $data['id_user'] = $user -> id;
+        $data['avt_user'] = $user -> avatar;
+        $data['name_user'] = $user -> name;
+        $data['time'] = now();
+        Comment::create($data);
+        return response() -> json(['data' => $data]);
+    }
 }

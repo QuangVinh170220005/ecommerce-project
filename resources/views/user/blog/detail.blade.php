@@ -233,12 +233,13 @@
                 <div class="response-area">
                     <h2>3 RESPONSES</h2>
                     <ul class="media-list">
-                        @foreach ($comment as $cmt )          
+                        @foreach ($comment as $cmt )
+                        @if ($cmt -> level == 0)
                         <li class="media">
                             <a class="pull-left" href="#">
                                 <img class="media-object"
-                                src="{{ asset('admin/assets/images/users/' . $cmt->avt_user) }}"
-                                style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                                    src="{{ asset('admin/assets/images/users/' . $cmt->avt_user) }}"
+                                    style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                             </a>
                             <div class="media-body">
                                 <ul class="sinlge-post-meta">
@@ -247,24 +248,61 @@
                                     <li><i class="fa fa-calendar"></i> {{ $cmt -> time }}</li>
                                 </ul>
                                 <p>{{ $cmt -> cmt }}</p>
-                                <a class="btn btn-primary" href=""><i class="fa fa-reply"></i>Replay</a>
+                                <button type="button" class="btn btn-primary reply">
+                                    <i class="fa fa-reply"></i> Reply
+                                </button>
+                                <!-- form ẩn để reply -->
+                                <div class="reply-form" style="display: none; margin-top: 15px;">
+                                    <textarea rows="3" class="form-control reply_message" placeholder="Write a reply..."></textarea>
+                                    <button class="btn btn-primary btn-sm post-reply" data-id="{{ $cmt -> id}}" style="margin-top: 5px;">Submit Reply</button>
+                                </div>
                             </div>
                         </li>
-                         @endforeach
+                        <ul class="reply-list"></ul>
+                        @foreach($comment as $reply)
+                        @if($reply -> level == $cmt -> id)
+                        
+                            <li class="media second-media">
+                                <a class="pull-left" href="#">
+                                    <img class="media-object" src="{{ asset('admin/assets/images/users/' . $reply->avt_user) }}"
+                                        style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                                </a>
+                                <div class="media-body">
+                                    <ul class="sinlge-post-meta">
+                                        <li><i class="fa fa-user"></i>{{ $reply -> name_user }}</li>
+                                        <li><i class="fa fa-clock-o"></i> 1:33 pm</li>
+                                        <li><i class="fa fa-calendar"></i> {{ $reply -> time }}</li>
+                                    </ul>
+                                    <p>{{ $reply -> cmt }}</p>
+                                    <button type="button" class="btn btn-primary reply">
+                                    <i class="fa fa-reply"></i> Reply
+                                </button>
+                                <div class="reply-form" style="display: none; margin-top: 15px;">
+                                    <textarea rows="3" class="form-control reply_message" placeholder="Write a reply..."></textarea>
+                                    <button class="btn btn-primary btn-sm post-reply" data-id="{{ $reply -> id}}" style="margin-top: 5px;">Submit Reply</button>
+                                </div>
+                                </div>
+                            </li>
+                        
+                        @endif
+                        @endforeach
+                        @endif
+                        @endforeach
+                        </ul>
                     </ul>
                 </div><!--/Response-area-->
                 <div class="replay-box">
                     <div class="row">
                         <div class="col-sm-12">
                             <h2>Leave a replay</h2>
-                                <div class="text-area">
-                                    <div class="blank-arrow">
-                                        <label>Your Name</label>
-                                    </div>
-                                    <span>*</span>
-                                    <textarea name="cmt" rows="11" class="comment_message"></textarea>
-                                    <button class="btn post">Post Comment</button>
+                            <div class="text-area">
+                                <div class="blank-arrow">
+                                    <label>Your Name</label>
                                 </div>
+                                <span>*</span>
+                                <textarea name="cmt" rows="11" class="comment_message"></textarea>
+                                <button class="btn post">Post Comment</button>
+                            </div>
                         </div>
                     </div>
                 </div><!--/Repaly Box-->
@@ -323,9 +361,9 @@
     });
 
     $(document).ready(function() {
-        $('.post').click(function(){
+        $('.post').click(function() {
             var checkLogin = "{{ Auth::check() }}";
-            if(checkLogin){
+            if (checkLogin) {
                 const cmt = $('.comment_message').val();
                 const id_blog = $('.vote').data('blog');
                 console.log('data')
@@ -334,17 +372,17 @@
                 $.ajax({
                     type: 'POST',
                     url: '{{ url("/shop/blog/detail/comment") }}',
-                    data:{
-                         _token: $('meta[name="csrf-token"]').attr('content'),
-                         cmt: cmt,
-                         id_blog: id_blog
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        cmt: cmt,
+                        id_blog: id_blog
                     },
-                    success:function(response){
+                    success: function(response) {
                         const cmt = response.data;
                         const html = `
                             <li class="media">
                             <a class="pull-left" href="#">
-                                <img class="media-object" src="/admin/assets/images/users/${cmt.avt_user}" alt=""
+                                <img class="media-object" src="/admin/assets/images/users/${reply.avt_user}" alt=""
                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                             </a>
                             <div class="media-body">
@@ -354,7 +392,9 @@
                                     <li><i class="fa fa-calendar"></i> ${cmt.time}</li>
                                 </ul>
                                 <p>${cmt.cmt}</p>
-                                <a class="btn btn-primary" href=""><i class="fa fa-reply"></i>Replay</a>
+                                <button type="button" class="btn btn-primary reply">
+                                    <i class="fa fa-reply"></i> Reply
+                                </button>
                             </div>
                         </li>
                         `
@@ -362,11 +402,72 @@
                         $('.comment_message').val('');
                     }
                 })
-            }else{
+            } else {
                 alert('Vui lòng login để comment');
             }
         })
     })
-</script>
 
+    let reply = document.querySelectorAll('.reply');
+    let form = document.querySelectorAll('.reply-form');
+    reply.forEach(function(item, index) {
+        item.addEventListener('click', function() {
+            form.forEach(function(e) {
+                e.style.display = "none";
+            })
+            form[index].style.display = "block";
+        })
+    })
+
+    $(document).ready(function() {
+        $('.post-reply').click(function() {
+            var checkLogin = "{{ Auth::check() }}";
+            if (checkLogin) {
+                const cmtReply = $(this).closest('.reply-form').find('.reply_message').val();
+                const id_blog = $('.vote').data('blog');
+                const id_cha = $(this).data('id');
+                console.log('Comment Reply')
+                console.log(cmtReply)
+                $.ajax({
+                    type: 'Post',
+                    url: '{{ url("/shop/blog/detail/replycmt")}}',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        cmt: cmtReply,
+                        id_blog: id_blog,
+                        level: id_cha
+                    },
+                    success: function(response) {
+                        const reply = response.data;
+                        const html = `
+                            <li class="media second-media">
+                            <a class="pull-left" href="#">
+                                <img class="media-object" src="/admin/assets/images/users/${reply.avt_user}" alt=""
+                                style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            </a>
+                            <div class="media-body">
+                                <ul class="sinlge-post-meta">
+                                    <li><i class="fa fa-user"></i>${reply.name_user}</li>
+                                    <li><i class="fa fa-clock-o"></i> 1:33 pm</li>
+                                    <li><i class="fa fa-calendar"></i> ${reply.time}</li>
+                                </ul>
+                                <p>${reply.cmt}</p>
+                               <button type="button"
+                                        class="btn btn-primary reply"
+                                        data-id="${reply.id}">
+                                    <i class="fa fa-reply"></i> Reply
+                                </button>
+                            </div>
+                        </li>
+                        `
+                        $('.reply-list').append(html);
+                        $('.reply-form').hide();
+                    }
+                })
+            } else {
+                alert('Đăng nhập để comment');
+            }
+        })
+    })
+</script>
 @endsection
