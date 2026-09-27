@@ -258,37 +258,28 @@
                                 </div>
                             </div>
                         </li>
-                        <ul class="reply-list"></ul>
-                        @foreach($comment as $reply)
-                        @if($reply -> level == $cmt -> id)
-                        
-                            <li class="media second-media">
-                                <a class="pull-left" href="#">
-                                    <img class="media-object" src="{{ asset('admin/assets/images/users/' . $reply->avt_user) }}"
-                                        style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
-                                </a>
-                                <div class="media-body">
-                                    <ul class="sinlge-post-meta">
-                                        <li><i class="fa fa-user"></i>{{ $reply -> name_user }}</li>
-                                        <li><i class="fa fa-clock-o"></i> 1:33 pm</li>
-                                        <li><i class="fa fa-calendar"></i> {{ $reply -> time }}</li>
-                                    </ul>
-                                    <p>{{ $reply -> cmt }}</p>
-                                    <button type="button" class="btn btn-primary reply">
-                                    <i class="fa fa-reply"></i> Reply
-                                </button>
-                                <div class="reply-form" style="display: none; margin-top: 15px;">
-                                    <textarea rows="3" class="form-control reply_message" placeholder="Write a reply..."></textarea>
-                                    <button class="btn btn-primary btn-sm post-reply" data-id="{{ $reply -> id}}" style="margin-top: 5px;">Submit Reply</button>
-                                </div>
-                                </div>
-                            </li>
-                        
+                        @foreach ($comment as $subCmt)
+                        @if ($subCmt->level == $cmt->id)
+                        <li class="media second-media">
+                            <a class="pull-left" href="#">
+                                <img class="media-object"
+                                    src="{{ asset('admin/assets/images/users/' . $subCmt->avt_user) }}"
+                                    style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
+                            </a>
+                            <div class="media-body">
+                                <ul class="sinlge-post-meta">
+                                    <li><i class="fa fa-user"></i>{{ $subCmt->name_user }}</li>
+                                    <li><i class="fa fa-clock-o"></i> 1:33 pm</li>
+                                    <li><i class="fa fa-calendar"></i> {{ $subCmt->time }}</li>
+                                </ul>
+                                <p>{{ $subCmt->cmt }}</p>
+                            </div>
+                        </li>
                         @endif
                         @endforeach
+
                         @endif
                         @endforeach
-                        </ul>
                     </ul>
                 </div><!--/Response-area-->
                 <div class="replay-box">
@@ -382,7 +373,7 @@
                         const html = `
                             <li class="media">
                             <a class="pull-left" href="#">
-                                <img class="media-object" src="/admin/assets/images/users/${reply.avt_user}" alt=""
+                                <img class="media-object" src="/admin/assets/images/users/${cmt.avt_user}" alt=""
                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
                             </a>
                             <div class="media-body">
@@ -395,6 +386,10 @@
                                 <button type="button" class="btn btn-primary reply">
                                     <i class="fa fa-reply"></i> Reply
                                 </button>
+                                <div class="reply-form" style="display: none; margin-top: 15px;">
+                                    <textarea rows="3" class="form-control reply_message" placeholder="Write a reply..."></textarea>
+                                    <button class="btn btn-primary btn-sm post-reply" data-id="${cmt.id}" style="margin-top: 5px;">Submit Reply</button>
+                                </div>
                             </div>
                         </li>
                         `
@@ -408,24 +403,20 @@
         })
     })
 
-    let reply = document.querySelectorAll('.reply');
-    let form = document.querySelectorAll('.reply-form');
-    reply.forEach(function(item, index) {
-        item.addEventListener('click', function() {
-            form.forEach(function(e) {
-                e.style.display = "none";
-            })
-            form[index].style.display = "block";
-        })
-    })
+    $(document).on('click', '.reply', function() {
+        $(this).closest('.media-body').find('.reply-form').toggle();
+    });
 
     $(document).ready(function() {
-        $('.post-reply').click(function() {
+        $(document).on('click', '.post-reply', function() {
             var checkLogin = "{{ Auth::check() }}";
             if (checkLogin) {
                 const cmtReply = $(this).closest('.reply-form').find('.reply_message').val();
                 const id_blog = $('.vote').data('blog');
                 const id_cha = $(this).data('id');
+
+                const btnReply = $(this).closest('.media');
+
                 console.log('Comment Reply')
                 console.log(cmtReply)
                 $.ajax({
@@ -452,15 +443,10 @@
                                     <li><i class="fa fa-calendar"></i> ${reply.time}</li>
                                 </ul>
                                 <p>${reply.cmt}</p>
-                               <button type="button"
-                                        class="btn btn-primary reply"
-                                        data-id="${reply.id}">
-                                    <i class="fa fa-reply"></i> Reply
-                                </button>
                             </div>
                         </li>
                         `
-                        $('.reply-list').append(html);
+                        btnReply.after(html);
                         $('.reply-form').hide();
                     }
                 })

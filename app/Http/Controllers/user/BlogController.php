@@ -59,9 +59,8 @@ class BlogController extends Controller
         $data['name_user'] = $user -> name;
         $data['level'] = 0;
         $data['time'] = now();
-        Comment::create($data);
-
-        return response() -> json(['data' => $data]);
+        $comment = Comment::create($data);
+        return response() -> json(['data' => $comment]);
     }
 
     function replyCmt(Request $req){
@@ -72,7 +71,7 @@ class BlogController extends Controller
         $data['avt_user'] = $user -> avatar;
         $data['name_user'] = $user -> name;
         $data['time'] = now();
-        Comment::create($data);
-        return response() -> json(['data' => $data]);
+        $comment = Comment::create($data);
+        return response() -> json(['data' => $comment]);
     }
 }
