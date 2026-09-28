@@ -19,7 +19,16 @@
 </head>
 <body>
     @include('user.layouts.header')
-    @yield('content')
+    <section>
+        <div class="container">
+            <div class="row">
+                @include('user.layouts.menu-left')
+                <div class="col-sm-9 padding-right">
+                     @yield('content')
+                </div>
+            </div>
+        </div>
+    </section>
     @include('user.layouts.footer')
 
     
