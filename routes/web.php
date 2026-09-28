@@ -4,6 +4,7 @@ use App\Http\Controllers\admin\BlogController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\user\AccountController;
 use App\Http\Controllers\user\AuthController;
 use App\Http\Controllers\user\BlogController as UserBlogController;
 use App\Models\Blog;
@@ -38,9 +39,17 @@ Route::get('/shop/register', [AuthController::class, 'register']);
 Route::post('/shop/register/create', [AuthController::class, 'handleRegister']);
 Route::get('/shop/login', [AuthController::class, 'login']);
 Route::post('/shop/handleLogin', [AuthController::class, 'handleLogin']);
+Route::get('/shop/logout', [AuthController::class, 'logout']);
 
+//blog
 Route::get('/shop/blog/list', [UserBlogController::class, 'getBlog']);
 Route::get('/shop/blog/detail/{id}', [UserBlogController::class, 'getBlogDetail']);
 Route::post('/shop/blog/detail/rate', [UserBlogController::class, 'blogRate']);
 Route::post('/shop/blog/detail/comment', [UserBlogController::class, 'commentBlog']);
 Route::post('/shop/blog/detail/replycmt', [UserBlogController::class, 'replyCmt']);
+
+//account
+Route::get('/shop/account/update', [AccountController::class, 'getAccount']);
+Route::post('/shop/account/update', [AccountController::class, 'update']);
+Route::get('/shop/account/add-product');
+

@@ -235,7 +235,7 @@
                     <ul class="media-list">
                         @foreach ($comment as $cmt )
                         @if ($cmt -> level == 0)
-                        <li class="media">
+                        <li class="media" data-id="{{ $cmt->id }}">
                             <a class="pull-left" href="#">
                                 <img class="media-object"
                                     src="{{ asset('admin/assets/images/users/' . $cmt->avt_user) }}"
@@ -371,7 +371,7 @@
                     success: function(response) {
                         const cmt = response.data;
                         const html = `
-                            <li class="media">
+                            <li class="media"  data-id="${cmt.id}>
                             <a class="pull-left" href="#">
                                 <img class="media-object" src="/admin/assets/images/users/${cmt.avt_user}" alt=""
                                 style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover;">
@@ -446,7 +446,7 @@
                             </div>
                         </li>
                         `
-                        btnReply.after(html);
+                        $(`.media[data-id="${id_cha}"]`).after(html);
                         $('.reply-form').hide();
                     }
                 })
