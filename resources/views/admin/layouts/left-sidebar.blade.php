@@ -22,6 +22,18 @@
                                 <span class="hide-menu">Country</span>
                             </a>
                         </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url('/admin/category/list') }}" aria-expanded="false">
+                                <i class="mdi mdi-border-none"></i>
+                                <span class="hide-menu">Category</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url('/admin/brand/list') }}" aria-expanded="false">
+                                <i class="mdi mdi-border-none"></i>
+                                <span class="hide-menu">Brand</span>
+                            </a>
+                        </li>
                          <li class="sidebar-item">
                             <a class="sidebar-link waves-effect waves-dark sidebar-link" href="{{ url('/admin/blog/list') }}" aria-expanded="false">
                                 <i class="mdi mdi-border-none"></i>

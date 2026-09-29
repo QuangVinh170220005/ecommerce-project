@@ -6,17 +6,17 @@
 
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4 class="panel-title"><a href="#">account</a></h4>
+                    <h4 class="panel-title"><a href="/shop/account">account</a></h4>
                 </div>
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4 class="panel-title"><a href="#">My product</a></h4>
+                    <h4 class="panel-title"><a href="/shop/account/my-product">My product</a></h4>
                 </div>
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <h4 class="panel-title"><a href="#">Add product</a></h4>
+                    <h4 class="panel-title"><a href="/shop/account/add-product">Add product</a></h4>
                 </div>
             </div>
 
