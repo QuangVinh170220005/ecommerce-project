@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\user\AccountController;
 use App\Http\Controllers\user\AuthController;
 use App\Http\Controllers\user\BlogController as UserBlogController;
+use App\Http\Controllers\user\ProductController;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -67,5 +68,6 @@ Route::post('/shop/blog/detail/replycmt', [UserBlogController::class, 'replyCmt'
 //account
 Route::get('/shop/account/update', [AccountController::class, 'getAccount']);
 Route::post('/shop/account/update', [AccountController::class, 'update']);
-Route::get('/shop/account/add-product');
+Route::get('/shop/account/add-product', [ProductController::class, 'addProduct']);
+Route::post('/shop/account/store', [ProductController::class, 'store']);
 
