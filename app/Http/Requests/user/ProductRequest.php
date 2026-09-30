@@ -30,7 +30,8 @@ class ProductRequest extends FormRequest
             'status' => 'required|in:0,1',
             'sale' => 'nullable|integer|min:0', 
             'company' => 'required|string',        
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'image' => 'required|array|max:3',
+            'image.*' => 'image|mimes:jpeg,png,jpg,gif|max:2048',
             'detail' => 'required|string',
         ];
     }
@@ -61,6 +62,7 @@ class ProductRequest extends FormRequest
 
             'image.string' => 'Hình ảnh không hợp lệ.',
             'image.max' => 'Tên hình ảnh không được vượt quá 1000 ký tự.',
+            'image.*.max' => 'Chỉ được upload tối đa 3 hình ảnh.',
 
             'detail.required' => 'Vui lòng nhập chi tiết sản phẩm.',
         ];

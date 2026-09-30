@@ -47,8 +47,8 @@
 							<label for="company">Company</label>
 							<input type="text" placeholder="Company" name="company" id="company" />
 
-							<label for="image">Image</label>
-							<input type="file" name="image" id="image" />
+							<label for="files">Select files:</label>
+							<input type="file" id="files" name="image[]" multiple><br><br>
 
 							<label for="detail">Detail</label>
 							<textarea name="detail" id="detail" placeholder="Nhập chi tiết sản phẩm"></textarea>
