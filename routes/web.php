@@ -70,4 +70,5 @@ Route::get('/shop/account/update', [AccountController::class, 'getAccount']);
 Route::post('/shop/account/update', [AccountController::class, 'update']);
 Route::get('/shop/account/add-product', [ProductController::class, 'addProduct']);
 Route::post('/shop/account/store', [ProductController::class, 'store']);
+Route::get('shop/account/my-product', [ProductController::class, 'getProduct']);
 

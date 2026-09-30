@@ -23,8 +23,6 @@ class ProductController extends Controller
         if (!Auth::check()) {
             return redirect('/shop/login')->with('error', 'Vui lòng đăng nhập để thêm sản phẩm.');
         }
-        
-
 
         $id = Auth::id();
         $data = $req -> all();
@@ -60,4 +58,12 @@ class ProductController extends Controller
         return redirect('/shop/account/update');
        }
     }
+
+    function getProduct(){
+        $data = Product::all()->toArray();
+        
+        return view('user.account.my-product', compact('data'));
+    }
+
+
 }
