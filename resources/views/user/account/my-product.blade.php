@@ -29,17 +29,15 @@
                                     <h4><a href="">{{ $product['name'] }}</a></h4>
                                 </td>
                                 <td class="cart_product">
-                                    <img src="{{ asset('user/images/product-details/' . $images[0]) }}" alt="">
+                                    <img src="{{ asset('user/images/product-details/' . $images[0]) }}" width="100px" alt="">
                                 </td>
                                 <td class="cart_price">
                                     <p>{{ $product['price'] }}</p>
                                 </td>
-
                                 <td class="cart_total">
-                                    <a>edit</a>
-                                    <a>delete</a>
+                                    <a href="/shop/accuont/edit-product/{{ $product['id']}}">edit</a>
+                                    <a href="/shop/account/delete-product/.{{ $product['id']}}">delete</a>
                                 </td>
-
                             </tr>
                             @endforeach
                         </tbody>
