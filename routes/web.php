@@ -73,4 +73,5 @@ Route::post('/shop/account/store', [ProductController::class, 'store']);
 Route::get('shop/account/my-product', [ProductController::class, 'getProduct']);
 Route::get('/shop/accuont/edit-product/{id}', [ProductController::class, 'edit']);
 Route::post('/shop/account/update-product/{id}', [ProductController::class, 'update']);
+Route::get('/shop/account/delete-product/{id}', [ProductController::class, 'delete']);
 

@@ -12,6 +12,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
+use Intervention\Image\Colors\Rgb\Channels\Red;
 use Intervention\Image\Laravel\Facades\Image;
 
 class ProductController extends Controller
@@ -79,11 +80,7 @@ class ProductController extends Controller
             foreach ($rmImg as $rm) {
                 foreach ($oldImage as $key => $img) {
                     if ($rm == $img) {
-                        File::delete([
-                            public_path('/user/images/product-details/' . $img),
-                            public_path('/user/images/product-details/hinh50' . $img),
-                            public_path('/user/images/product-details/hinh200' . $img),
-                        ]);
+                        $this->deleteProductImageFiles($img);
                         unset($oldImage[$key]);
                     }
                 }
@@ -106,6 +103,27 @@ class ProductController extends Controller
                 return redirect('/shop/account/edit-product');
             }
         }
+    }
+
+    function delete($id){
+        $product = Product::findOrFail($id);
+        $images = json_decode($product->image, true) ?: [];
+
+        foreach ($images as $image) {
+            $this->deleteProductImageFiles($image);
+        }
+
+        $product->delete();
+        return redirect('/shop/account/my-product');
+    }
+
+    function deleteProductImageFiles($image)
+    {
+        File::delete([
+            public_path('/user/images/product-details/' . $image),
+            public_path('/user/images/product-details/hinh50' . $image),
+            public_path('/user/images/product-details/hinh200' . $image),
+        ]);
     }
 
     function uploadProductImages($files)

@@ -35,8 +35,8 @@
                                     <p>{{ $product['price'] }}</p>
                                 </td>
                                 <td class="cart_total">
-                                    <a href="/shop/accuont/edit-product/{{ $product['id']}}">edit</a>
-                                    <a href="/shop/account/delete-product/.{{ $product['id']}}">delete</a>
+                                    <a href="/shop/account/edit-product/{{ $product['id']}}">edit</a>
+                                    <a href="/shop/account/delete-product/{{ $product['id']}}">delete</a>
                                 </td>
                             </tr>
                             @endforeach
