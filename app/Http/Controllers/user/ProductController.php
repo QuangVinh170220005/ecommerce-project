@@ -11,9 +11,8 @@ use App\Models\Country;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
 use Intervention\Image\Laravel\Facades\Image;
-
-use function Laravel\Prompts\alert;
 
 class ProductController extends Controller
 {
@@ -39,28 +38,13 @@ class ProductController extends Controller
         }
         $images = [];
         if ($req->hasFile('image')) {
-            foreach ($req->file('image') as $img) {
-                $image = Image::read($img);
-                $name = $img->getClientOriginalName();
-                $name1 = 'hinh50' . $img->getClientOriginalName();
-                $name2 = 'hinh200' . $img->getClientOriginalName();
-
-                $path = public_path('/user/images/product-details/' . $name);
-                $path1 = public_path('/user/images/product-details/' . $name1);
-                $path2 = public_path('/user/images/product-details/' . $name2);
-
-                $image->save($path);
-                $image->resize(50, 70)->save($path1);
-                $image->resize(200, 300)->save($path2);
-
-                $images[] = $name;
-            }
+            $images = $this->uploadProductImages($req->file('image'));
         }
 
         $data['image'] = json_encode($images);
 
         if (Product::create($data)) {
-            return redirect('/shop/account/add-product');
+            return redirect('/shop/account/my-product');
         } else {
             return redirect('/shop/account/update');
         }
@@ -82,7 +66,7 @@ class ProductController extends Controller
     }
 
     function update(UpdateProductRequest $req, $id)
-    {   
+    {
         $prod = Product::findOrFail($id);
         $data = $req->all();
         $oldImage = json_decode($prod->image, true);
@@ -90,47 +74,58 @@ class ProductController extends Controller
         if (empty($data['sale'])) {
             $data['sale'] = $prod->sale;
         }
-        if(!empty($req->rmImage)){
+        if (!empty($req->rmImage)) {
             $rmImg = $req->rmImage;
-        foreach ($rmImg as $rm) {
-            foreach ($oldImage as $key => $img) {
-                if ($rm == $img) {
-                    unset($oldImage[$key]);
+            foreach ($rmImg as $rm) {
+                foreach ($oldImage as $key => $img) {
+                    if ($rm == $img) {
+                        File::delete([
+                            public_path('/user/images/product-details/' . $img),
+                            public_path('/user/images/product-details/hinh50' . $img),
+                            public_path('/user/images/product-details/hinh200' . $img),
+                        ]);
+                        unset($oldImage[$key]);
+                    }
                 }
             }
-        }
         }
         $oldImage = array_values($oldImage);
 
         $images = [];
         if ($req->hasFile('image')) {
-            foreach ($req->file('image') as $img) {
-                $image = Image::read($img);
-                $name = $img->getClientOriginalName();
-                $name1 = 'hinh50' . $img->getClientOriginalName();
-                $name2 = 'hinh200' . $img->getClientOriginalName();
-
-                $path = public_path('/user/images/product-details/' . $name);
-                $path1 = public_path('/user/images/product-details/' . $name1);
-                $path2 = public_path('/user/images/product-details/' . $name2);
-
-                $image->save($path);
-                $image->resize(50, 70)->save($path1);
-                $image->resize(200, 300)->save($path2);
-                $images[] = $name;
-            }
+            $images = $this->uploadProductImages($req->file('image'));
         }
         $newImage = array_merge($oldImage, $images);
         if (count($newImage) > 3) {
-              return back()->with('error', 'Tối đa 3 hình');
+            return back()->with('error', 'Tối đa 3 hình');
         } else {
             $data['image'] = json_encode($newImage);
-            if ($prod -> update($data)) {
+            if ($prod->update($data)) {
                 return redirect('/shop/account/my-product');
             } else {
                 return redirect('/shop/account/edit-product');
             }
         }
-       
+    }
+
+    function uploadProductImages($files)
+    {
+        $images = [];
+        foreach ($files as $img) {
+            $image = Image::read($img);
+            $name = $img->getClientOriginalName();
+            $name1 = 'hinh50' . $img->getClientOriginalName();
+            $name2 = 'hinh200' . $img->getClientOriginalName();
+
+            $path = public_path('/user/images/product-details/' . $name);
+            $path1 = public_path('/user/images/product-details/' . $name1);
+            $path2 = public_path('/user/images/product-details/' . $name2);
+
+            $image->save($path);
+            $image->resize(50, 70)->save($path1);
+            $image->resize(200, 300)->save($path2);
+            $images[] = $name;
+        }
+        return $images;
     }
 }

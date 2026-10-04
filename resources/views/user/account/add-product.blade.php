@@ -53,7 +53,7 @@
 							<label for="detail">Detail</label>
 							<textarea name="detail" id="detail" placeholder="Nhập chi tiết sản phẩm"></textarea>
 
-							<button type="submit" class="btn btn-default">Signup</button>
+							<button type="submit" class="btn btn-default">Add Product</button>
 						</form>
 					</div>
 				</div>
