@@ -22,7 +22,9 @@
     <section>
         <div class="container">
             <div class="row">
-                @include('user.layouts.menu-left')
+                @if (request()->is('shop/account*'))
+                    @include('user.layouts.menu-left')
+                @endif
                 <div class="col-sm-9 padding-right">
                      @yield('content')
                 </div>

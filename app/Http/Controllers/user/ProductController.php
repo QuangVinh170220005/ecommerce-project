@@ -146,4 +146,9 @@ class ProductController extends Controller
         }
         return $images;
     }
+
+    function showProduct($id){
+        $data = Product::findOrFail($id);
+        return view('user.product.detail', compact('data'));
+    }
 }

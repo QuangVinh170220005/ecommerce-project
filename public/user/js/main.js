@@ -7,6 +7,12 @@ var RGBChange = function () {
     $('#RGB').css('background', 'rgb(' + r.getValue() + ',' + g.getValue() + ',' + b.getValue() + ')')
 };
 
+$(document).ready(function () {
+    $('a[rel^="prettyPhoto"]').prettyPhoto({
+        modal: false
+    });
+});
+
 /*scroll to top*/
 
 $(document).ready(function () {
