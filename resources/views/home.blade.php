@@ -225,7 +225,7 @@
                                     <a class="product-name" href="{{url('/shop/product/detail/'.$data -> id)}}">
                                         {{ $data->name }}
                                     </a>
-                                    <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+                                    <a class="btn btn-default add-to-cart" data-id="{{ $data -> id}}"><i class="fa fa-shopping-cart"></i>Add to cart</a>
                                 </div>
                                 <div class="product-overlay">
                                     <div class="overlay-content">
@@ -233,7 +233,7 @@
                                         <a class="product-name" href="{{url('/shop/product/detail/'.$data -> id)}}">
                                             {{ $data->name }}
                                         </a>
-                                        <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+                                        <a  class="btn btn-default add-to-cart" data-id="{{ $data -> id}}"><i class="fa fa-shopping-cart" ></i>Add to cart</a>
                                     </div>
                                 </div>
                             </div>
@@ -632,9 +632,28 @@
                         </a>
                     </div>
                 </div><!--/recommended_items-->
-
             </div>
         </div>
     </div>
 </section>
+<script>
+    $(document).ready(function(){
+        $('.add-to-cart').click(function(e){
+            e.preventDefault();
+            getId = $(this).data('id');
+            $.ajax({
+                url: '{{ url("/shop/cart/add") }}',
+                type: 'POST',
+                data:{
+                    id: getId,
+                   _token: $('meta[name="csrf-token"]').attr('content'),
+                },
+                success:function(res){
+                    console.log(res);
+                    $('#qty').text(res.count);
+                }
+            })
+        })
+    })
+</script>
 @endsection

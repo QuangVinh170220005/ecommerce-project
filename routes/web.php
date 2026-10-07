@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\CountryController;
 use App\Http\Controllers\user\AccountController;
 use App\Http\Controllers\user\AuthController;
 use App\Http\Controllers\user\BlogController as UserBlogController;
+use App\Http\Controllers\user\CartController;
 use App\Http\Controllers\user\ProductController;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
@@ -77,3 +78,9 @@ Route::get('/shop/account/delete-product/{id}', [ProductController::class, 'dele
 
 //product detail
 Route::get('/shop/product/detail/{id}', [ProductController::class, 'showProduct']);
+
+// cart
+Route::post('/shop/cart/add', [CartController::class, 'addToCart']);
+Route::get('/shop/cart', [CartController::class, 'showCart']);
+Route::post('/shop/cart/update-quantity', [CartController::class, 'updateQuantity']);
+Route::post('/shop/cart/delete', [CartController::class, 'deleteCart']);
