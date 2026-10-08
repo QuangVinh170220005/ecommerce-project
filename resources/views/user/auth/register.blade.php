@@ -3,8 +3,6 @@
 @section('content')
 
 <section id="form">
-    <div class="container">
-        <div class="row">
 
             <div class="col-sm-8 col-sm-offset-2">
 
@@ -85,9 +83,6 @@
                 </div>
 
             </div>
-
-        </div>
-    </div>
 </section>
 
 @endsection

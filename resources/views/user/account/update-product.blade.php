@@ -1,10 +1,6 @@
 @extends('user.layouts.app')
 @section('content')
-<section>
-	<div class="container">
-		<div class="row">
-			<div class="col-sm-9">
-				<div class="blog-post-area">
+<div class="blog-post-area">
 					<h2 class="title text-center">Update user</h2>
 					<div class="signup-form"><!--sign up form-->
 						<h2>Update Product</h2>
@@ -91,10 +87,6 @@
 						</form>
 					</div>
 				</div>
-			</div>
-		</div>
-	</div>
-</section>
 <script>
 	let status = document.getElementById('status');
 	let sale = document.getElementById('sale-box');

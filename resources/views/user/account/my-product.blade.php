@@ -1,10 +1,6 @@
 @extends('user.layouts.app')
 @section('content')
-<section>
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-9">
-                <div class="table-responsive cart_info">
+<div class="table-responsive cart_info">
                     <table class="table table-condensed">
                         <thead>
                             <tr class="cart_menu">
@@ -43,8 +39,4 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-    </div>
-</section>
 @endsection

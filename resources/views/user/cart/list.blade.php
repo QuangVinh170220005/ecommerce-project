@@ -1,7 +1,6 @@
 @extends('user.layouts.app')
 @section('content')
 <section id="cart_items">
-    <div class="container">
         <div class="breadcrumbs">
             <ol class="breadcrumb">
                 <li><a href="#">Home</a></li>
@@ -51,11 +50,9 @@
                 </tbody>
             </table>
         </div>
-    </div>
 </section> <!--/#cart_items-->
 
 <section id="do_action">
-    <div class="container">
         <div class="heading">
             <h3>What would you like to do next?</h3>
             <p>Choose if you have a discount code or reward points you want to use or would like to estimate your delivery cost.</p>
@@ -128,7 +125,6 @@
                 </div>
             </div>
         </div>
-    </div>
 </section>
 <script>
     function updateItem(item, check) {

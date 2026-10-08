@@ -19,13 +19,16 @@
 </head>
 <body>
     @include('user.layouts.header')
+    @yield('slider')
     <section>
         <div class="container">
             <div class="row">
                 @if (request()->is('shop/account*'))
+                    @include('user.layouts.menu-account')
+                @elseif (!request()->is('shop/login') && !request()->is('shop/register'))
                     @include('user.layouts.menu-left')
                 @endif
-                <div class="col-sm-9 padding-right">
+                <div class="{{ (request()->is('shop/login') || request()->is('shop/register')) ? 'col-sm-12' : 'col-sm-9 padding-right' }}">
                      @yield('content')
                 </div>
             </div>
