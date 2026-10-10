@@ -13,6 +13,7 @@ use App\Http\Controllers\user\CartController;
 use App\Http\Controllers\user\CheckoutController;
 use App\Http\Controllers\user\MailController;
 use App\Http\Controllers\user\ProductController;
+use App\Http\Controllers\user\SearchController;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -94,5 +95,8 @@ Route::get('/test', [MailController::class, 'index']);
 Route::get('/shop/checkout', [CheckoutController::class, 'checkout']);
 Route::post('/shop/checkout/register', [CheckoutController::class, 'quickRegister']);
 Route::post('/shop/checkout/order', [CheckoutController::class, 'order']);
+
+//search
+Route::get('shop/search', [SearchController::class, 'searchProduct']);
 
 

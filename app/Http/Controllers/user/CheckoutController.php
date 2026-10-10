@@ -9,7 +9,7 @@ use App\Models\Country;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Mail;
+use Illuminate\Support\Facades\Mail;
 
 class CheckoutController extends Controller
 {
