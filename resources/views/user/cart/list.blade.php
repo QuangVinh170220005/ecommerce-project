@@ -121,7 +121,7 @@
                         <li>Total <span>$61</span></li>
                     </ul>
                     <a class="btn btn-default update" href="">Update</a>
-                    <a class="btn btn-default check_out" href="">Check Out</a>
+                    <a class="btn btn-default check_out" href="/shop/checkout">Check Out</a>
                 </div>
             </div>
         </div>

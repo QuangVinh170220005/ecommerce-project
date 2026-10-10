@@ -8,15 +8,12 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Attachment;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
-use Illuminate\Mail\Mailables\Address;
 use Illuminate\Queue\SerializesModels;
 
-class MailNotify extends Mailable
+class OrderMail extends Mailable
 {
     use Queueable, SerializesModels;
-
     public $data;
-
     /**
      * Create a new message instance.
      */
@@ -31,8 +28,7 @@ class MailNotify extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('quangvinhabcdg@gmail.com', 'test'),
-            subject: $this->data['subject']
+            subject: 'Xác nhận đơn hàng',
         );
     }
 
@@ -42,8 +38,7 @@ class MailNotify extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'user.emails.index',
-            with: ['data' => $this->data],
+            view: 'user.emails.order-mail',
         );
     }
 

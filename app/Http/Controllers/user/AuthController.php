@@ -19,17 +19,8 @@ class AuthController extends Controller
     
     function handleRegister(RegisterRequest $req){
         $data = $req -> all();
-        $data['level'] = 0;
-        $file = $req -> avatar;
-        if(!empty($file)){
-            $data['avatar'] = $file -> getClientOriginalName();
-            $file->move('admin/assets/images/users', $file->getClientOriginalName());
-        }
-        if(User::create($data)){
-            return redirect('/shop/login')-> with('success', __('Create user success.'));
-        }else{
-            return redirect('/shop/register')-> with('error', __('Create user error.'));
-        }
+        $this -> crerateUser($data);
+        return redirect('shop/login') -> with('success', 'Register successfull');
     }
 
     function login(){
@@ -57,5 +48,15 @@ class AuthController extends Controller
     function logout(){
         Auth::logout();
         return view('user.auth.login');
+    }
+
+    public function crerateUser(array $data){
+        $data['level'] = 0;
+        $file = $data['avatar']; 
+        if(!empty($file)){
+            $data['avatar'] = $file -> getClientOriginalName();
+            $file->move('admin/assets/images/users', $file->getClientOriginalName());
+        }
+        return User::create($data);
     }
 }

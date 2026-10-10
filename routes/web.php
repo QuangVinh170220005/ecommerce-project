@@ -10,6 +10,8 @@ use App\Http\Controllers\user\AccountController;
 use App\Http\Controllers\user\AuthController;
 use App\Http\Controllers\user\BlogController as UserBlogController;
 use App\Http\Controllers\user\CartController;
+use App\Http\Controllers\user\CheckoutController;
+use App\Http\Controllers\user\MailController;
 use App\Http\Controllers\user\ProductController;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
@@ -84,3 +86,13 @@ Route::post('/shop/cart/add', [CartController::class, 'addToCart']);
 Route::get('/shop/cart', [CartController::class, 'showCart']);
 Route::post('/shop/cart/update-quantity', [CartController::class, 'updateQuantity']);
 Route::post('/shop/cart/delete', [CartController::class, 'deleteCart']);
+
+//mail
+Route::get('/test', [MailController::class, 'index']);
+
+//checkout
+Route::get('/shop/checkout', [CheckoutController::class, 'checkout']);
+Route::post('/shop/checkout/register', [CheckoutController::class, 'quickRegister']);
+Route::post('/shop/checkout/order', [CheckoutController::class, 'order']);
+
+
