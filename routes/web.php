@@ -97,6 +97,9 @@ Route::post('/shop/checkout/register', [CheckoutController::class, 'quickRegiste
 Route::post('/shop/checkout/order', [CheckoutController::class, 'order']);
 
 //search
-Route::get('shop/search', [SearchController::class, 'searchProduct']);
+Route::get('/shop/search', [SearchController::class, 'searchName']);
+Route::post('/shop/search-advanced', [SearchController::class, 'handleSearch']);
+Route::get('/shop/show-search', [SearchController::class, 'showAdvanced']);
+Route::post('/shop/search-price',[SearchController::class, 'searchPrice']);
 
 
