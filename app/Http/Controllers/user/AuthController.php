@@ -12,49 +12,57 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
-    function register(){
+    function register()
+    {
         $data = Country::all();
         return view('user.auth.register', compact('data'));
     }
-    
-    function handleRegister(RegisterRequest $req){
-        $data = $req -> all();
-        $this -> crerateUser($data);
-        return redirect('shop/login') -> with('success', 'Register successfull');
+
+    function handleRegister(RegisterRequest $req)
+    {
+        $data = $req->all();
+        $this->crerateUser($data);
+        return redirect('shop/login')->with('success', 'Register successfull');
     }
 
-    function login(){
+    function login()
+    {
         return view('user.auth.login');
     }
 
-    function handleLogin(LoginRequest $req){
+    function handleLogin(LoginRequest $req)
+    {
         $login = [
-            'email' => $req -> email,
-            'password' => $req -> password,
-            'level' => 0
+            'email' => $req->email,
+            'password' => $req->password,
         ];
         $remember = false;
-        if($req -> remember_me){
+        if ($req->remember_me) {
             $remember = true;
         }
-        if(Auth::attempt($login, $remember)){
-            return redirect('/shop/blog/list')->with('success', 'Đăng nhập thành công.');
-        }else{
+        if (Auth::attempt($login, $remember)) {
+            if (Auth::user()->level == 1) {
+                return redirect('/admin/dashboard')->with('success', 'Đăng nhập Admin thành công.');
+            }
+            return redirect('/home')->with('success', 'Đăng nhập thành công.');
+        } else {
             return redirect('/shop/login')->with('error', 'Email hoặc mật khẩu không đúng.');
         }
-        
+
     }
 
-    function logout(){
+    function logout()
+    {
         Auth::logout();
-        return view('user.auth.login');
+        return redirect('/shop/login');
     }
 
-    public function crerateUser(array $data){
+    public function crerateUser(array $data)
+    {
         $data['level'] = 0;
-        $file = $data['avatar']; 
-        if(!empty($file)){
-            $data['avatar'] = $file -> getClientOriginalName();
+        $file = $data['avatar'];
+        if (!empty($file)) {
+            $data['avatar'] = $file->getClientOriginalName();
             $file->move('admin/assets/images/users', $file->getClientOriginalName());
         }
         return User::create($data);

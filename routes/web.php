@@ -19,65 +19,78 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 //admin
-Route::get('/admin/dashboard', [DashboardController::class, 'index']);
 
-Route::get('/admin/profile', [ProfileController::class, 'getProfile']);
-Route::post('/admin/profile', [ProfileController::class, 'updateProfile']);
+Route::group([
+    'middleware' => 'admin'
+], function () {
+    Route::get('/admin/dashboard', [DashboardController::class, 'index']);
+    Route::get('/admin/profile', [ProfileController::class, 'getProfile']);
+    Route::post('/admin/profile', [ProfileController::class, 'updateProfile']);
 
-//country
-Route::get('/admin/country/list', [CountryController::class, 'getCountry']);
-Route::get('/admin/country/add', [CountryController::class, 'addCountry']);
-Route::post('/admin/country/store', [CountryController::class, 'store']);
-Route::get('/admin/country/delete/{id}', [CountryController::class, 'delete']);
+    //country
+    Route::get('/admin/country/list', [CountryController::class, 'getCountry']);
+    Route::get('/admin/country/add', [CountryController::class, 'addCountry']);
+    Route::post('/admin/country/store', [CountryController::class, 'store']);
+    Route::get('/admin/country/delete/{id}', [CountryController::class, 'delete']);
 
-//blog
-Route::get('/admin/blog/list', [BlogController::class, 'getBlog']);
-Route::get('/admin/blog/add', [BlogController::class, 'addBlog']);
-Route::post('/admin/blog/store', [BlogController::class, 'store']);
-Route::get('/admin/blog/edit/{id}', [BlogController::class, 'editBlog']);
-Route::post('/admin/blog/update/{id}', [BlogController::class, 'update']);
-Route::get('/admin/blog/delete/{id}', [BlogController::class, 'delete']);
+    //blog
+    Route::get('/admin/blog/list', [BlogController::class, 'getBlog']);
+    Route::get('/admin/blog/add', [BlogController::class, 'addBlog']);
+    Route::post('/admin/blog/store', [BlogController::class, 'store']);
+    Route::get('/admin/blog/edit/{id}', [BlogController::class, 'editBlog']);
+    Route::post('/admin/blog/update/{id}', [BlogController::class, 'update']);
+    Route::get('/admin/blog/delete/{id}', [BlogController::class, 'delete']);
 
-//category
-Route::get('/admin/category/list', [CategoryController::class, 'getCategory']);
-Route::get('/admin/category/add', [CategoryController::class, 'add']);
-Route::post('/admin/category/store', [CategoryController::class, 'store']);
-Route::get('/admin/category/delete/{id}', [CategoryController::class, 'delete']);
+    //category
+    Route::get('/admin/category/list', [CategoryController::class, 'getCategory']);
+    Route::get('/admin/category/add', [CategoryController::class, 'add']);
+    Route::post('/admin/category/store', [CategoryController::class, 'store']);
+    Route::get('/admin/category/delete/{id}', [CategoryController::class, 'delete']);
 
-//brand
-Route::get('/admin/brand/list', [BrandController::class, 'getBrand']);
-Route::get('/admin/brand/add', [BrandController::class, 'add']);
-Route::post('/admin/brand/store', [BrandController::class, 'store']);
-Route::get('/admin/brand/delete/{id}', [BrandController::class, 'delete']);
-
+    //brand
+    Route::get('/admin/brand/list', [BrandController::class, 'getBrand']);
+    Route::get('/admin/brand/add', [BrandController::class, 'add']);
+    Route::post('/admin/brand/store', [BrandController::class, 'store']);
+    Route::get('/admin/brand/delete/{id}', [BrandController::class, 'delete']);
+});
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::group([
+    'middleware' => 'memberIsLogin'
+], function () {
+    Route::get('/shop/register', [AuthController::class, 'register']);
+    Route::post('/shop/register/create', [AuthController::class, 'handleRegister']);
+    Route::get('/shop/login', [AuthController::class, 'login']);
+    Route::post('/shop/handleLogin', [AuthController::class, 'handleLogin']);
+});
 
-//user
-//auth
-Route::get('/shop/register', [AuthController::class, 'register']);
-Route::post('/shop/register/create', [AuthController::class, 'handleRegister']);
-Route::get('/shop/login', [AuthController::class, 'login']);
-Route::post('/shop/handleLogin', [AuthController::class, 'handleLogin']);
-Route::get('/shop/logout', [AuthController::class, 'logout']);
+Route::group([
+    'middleware' => 'member'
+], function () {
+    //user
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+    Route::get('/shop/logout', [AuthController::class, 'logout']);
 
+    //account
+    Route::get('/shop/account/update', [AccountController::class, 'getAccount']);
+    Route::post('/shop/account/update', [AccountController::class, 'update']);
+    Route::get('/shop/account/add-product', [ProductController::class, 'addProduct']);
+    Route::post('/shop/account/store', [ProductController::class, 'store']);
+    Route::get('shop/account/my-product', [ProductController::class, 'getProduct']);
+    Route::get('/shop/accuont/edit-product/{id}', [ProductController::class, 'edit']);
+    Route::post('/shop/account/update-product/{id}', [ProductController::class, 'update']);
+    Route::get('/shop/account/delete-product/{id}', [ProductController::class, 'delete']);
+
+
+});
+
+//public routes
 //blog
 Route::get('/shop/blog/list', [UserBlogController::class, 'getBlog']);
 Route::get('/shop/blog/detail/{id}', [UserBlogController::class, 'getBlogDetail']);
 Route::post('/shop/blog/detail/rate', [UserBlogController::class, 'blogRate']);
 Route::post('/shop/blog/detail/comment', [UserBlogController::class, 'commentBlog']);
 Route::post('/shop/blog/detail/replycmt', [UserBlogController::class, 'replyCmt']);
-
-//account
-Route::get('/shop/account/update', [AccountController::class, 'getAccount']);
-Route::post('/shop/account/update', [AccountController::class, 'update']);
-Route::get('/shop/account/add-product', [ProductController::class, 'addProduct']);
-Route::post('/shop/account/store', [ProductController::class, 'store']);
-Route::get('shop/account/my-product', [ProductController::class, 'getProduct']);
-Route::get('/shop/accuont/edit-product/{id}', [ProductController::class, 'edit']);
-Route::post('/shop/account/update-product/{id}', [ProductController::class, 'update']);
-Route::get('/shop/account/delete-product/{id}', [ProductController::class, 'delete']);
 
 //product detail
 Route::get('/shop/product/detail/{id}', [ProductController::class, 'showProduct']);
@@ -88,18 +101,23 @@ Route::get('/shop/cart', [CartController::class, 'showCart']);
 Route::post('/shop/cart/update-quantity', [CartController::class, 'updateQuantity']);
 Route::post('/shop/cart/delete', [CartController::class, 'deleteCart']);
 
+//search
+Route::get('/shop/search', [SearchController::class, 'searchName']);
+Route::post('/shop/search-advanced', [SearchController::class, 'handleSearch']);
+Route::get('/shop/show-search', [SearchController::class, 'showAdvanced']);
+Route::post('/shop/search-price', [SearchController::class, 'searchPrice']);
+
 //mail
 Route::get('/test', [MailController::class, 'index']);
+
 
 //checkout
 Route::get('/shop/checkout', [CheckoutController::class, 'checkout']);
 Route::post('/shop/checkout/register', [CheckoutController::class, 'quickRegister']);
 Route::post('/shop/checkout/order', [CheckoutController::class, 'order']);
 
-//search
-Route::get('/shop/search', [SearchController::class, 'searchName']);
-Route::post('/shop/search-advanced', [SearchController::class, 'handleSearch']);
-Route::get('/shop/show-search', [SearchController::class, 'showAdvanced']);
-Route::post('/shop/search-price',[SearchController::class, 'searchPrice']);
+
+
+
 
 
