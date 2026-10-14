@@ -4,41 +4,44 @@
 
 <section id="form">
 
-            <div class="col-sm-4 col-sm-offset-4">
+    <div class="col-sm-4 col-sm-offset-4">
 
-                <div class="login-form">
+        <div class="login-form">
 
-                    <h2>Login to your account</h2>
+            <h2>Login to your account</h2>
 
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                    <form method="post" action="/shop/handleLogin">
-                        @csrf
-                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Email Address">
-                        <input type="password" name="password" placeholder="Password">
-                        <span>
-                            <input type="checkbox" name="remember_me" class="checkbox">
-                            Keep me signed in
-                        </span>
-                        <button type="submit" class="btn btn-default">
-                            Login
-                        </button>
-                    </form>
-                    <p style="margin-top: 15px;">
-                        Don't have an account?
-                        <a href="/shop/register">Register now</a>
-                    </p>
-
-                </div>
-
+            @if ($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
+            @endif
+            <form method="post" action="/shop/handleLogin">
+                @csrf
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="Email Address">
+                <input type="password" name="password" placeholder="Password">
+                <span>
+                    <input type="checkbox" name="remember_me" class="checkbox">
+                    Keep me signed in
+                </span>
+                <button type="submit" class="btn btn-default">
+                    Login
+                </button>
+            </form>
+            <p style="margin-top: 15px;">
+                <a href="/shop/forgot-password">Forgot password?</a>
+            </p>
+            <p style="margin-top: 15px;">
+                Don't have an account?
+                <a href="/shop/register">Register now</a>
+            </p>
+
+        </div>
+
+    </div>
 </section>
 
 @endsection

@@ -5,10 +5,16 @@ namespace App\Http\Controllers\user;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\user\LoginRequest;
 use App\Http\Requests\user\RegisterRequest;
+use App\Http\Requests\user\ResetPasswordRequest;
+use App\Mail\ResetPassMail;
 use App\Models\Country;
 use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+
+use function Laravel\Prompts\alert;
 
 class AuthController extends Controller
 {
@@ -66,5 +72,42 @@ class AuthController extends Controller
             $file->move('admin/assets/images/users', $file->getClientOriginalName());
         }
         return User::create($data);
+    }
+
+    function fogotPass(){
+        return view('user.password.forgot-password');
+    }
+
+    function resetPass($id){
+        $user = User::findOrFail($id);
+        return view('user.password.reset-password', compact('user'));
+    }
+
+    function sendMail(Request $req){
+        $mail = $req -> email;
+        $user = User::where('email', $mail)->first();
+        if(!$user){
+            alert('Email không tồn tại bạn');
+        }
+        $data=[
+            'url' => 'http://127.0.0.1:8000/shop/reset-password/'.$user -> id,
+        ];
+        try{
+            Mail::to($mail)->send(new ResetPassMail($data));
+        }catch(Exception $e){
+            dd($e->getMessage());
+        }
+    }
+    function resetPassword(ResetPasswordRequest $req, $id){
+        $password = $req -> password;
+        $user = User::findOrFail($id);
+
+        $pass['password'] = bcrypt($password);
+
+        if($user -> update($pass)){
+            return redirect('/shop/login');
+        }else{
+            return redirect('/shop/register');
+        }
     }
 }

@@ -116,6 +116,12 @@ Route::get('/shop/checkout', [CheckoutController::class, 'checkout']);
 Route::post('/shop/checkout/register', [CheckoutController::class, 'quickRegister']);
 Route::post('/shop/checkout/order', [CheckoutController::class, 'order']);
 
+//forget pass
+Route::get('/shop/forgot-password', [AuthController::class, 'fogotPass']);
+Route::post('/shop/forgot-password', [AuthController::class, 'sendMail']);
+Route::get('/shop/reset-password/{id}',[ AuthController::class, 'resetPass']);
+Route::post('/shop/reset-password/{id}', [AuthController::class, 'resetPassword']);
+
 
 
 
