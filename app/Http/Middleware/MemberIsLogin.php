@@ -16,12 +16,9 @@ class MemberIsLogin
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check()) {
-            if (Auth::user()->level == 1) {
-                return redirect('/admin/dashboard');
-            }
+        if (Auth::check() && Auth::user() -> level == 0) {
             return redirect('/home');
-        }
+        }   
         return $next($request);
     }
 }
