@@ -6,6 +6,9 @@ use App\Http\Controllers\admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\admin\ProfileController;
 use App\Http\Controllers\Admin\CountryController;
+use App\Http\Controllers\admin\OrderController;
+use App\Http\Controllers\admin\ProductController as AdminProductController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\user\AccountController;
 use App\Http\Controllers\user\AuthController;
 use App\Http\Controllers\user\BlogController as UserBlogController;
@@ -14,6 +17,7 @@ use App\Http\Controllers\user\CheckoutController;
 use App\Http\Controllers\user\MailController;
 use App\Http\Controllers\user\ProductController;
 use App\Http\Controllers\user\SearchController;
+use App\Http\Middleware\Admin;
 use App\Models\Blog;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +56,23 @@ Route::group([
     Route::get('/admin/brand/add', [BrandController::class, 'add']);
     Route::post('/admin/brand/store', [BrandController::class, 'store']);
     Route::get('/admin/brand/delete/{id}', [BrandController::class, 'delete']);
+    
+    //user
+    Route::get('/admin/user/list', [UserController::class, 'showUser']);
+    Route::get('/admin/user/edit/{id}', [UserController::class, 'editUser']);
+    Route::post('/admin/user/update/{id}', [UserController::class, 'updateUser']);
+    Route::post('/admin/user/delete', [UserController::class, 'deleteUser']);
+
+    //product
+    Route::get('/admin/product/list', [AdminProductController::class, 'showProduct']);
+    Route::post('/admin/product/search', [AdminProductController::class, 'searchProduct']);
+    Route::get('/admin/product/edit/{id}', [AdminProductController::class, 'editProduct']);
+    Route::post('/admin/product/update/{id}', [AdminProductController::class, 'updateProduct']);
+    Route::post('/admin/product/delete', [AdminProductController::class, 'deleteProduct']);
+
+    // history order
+    Route::get('/admin/order/list', [OrderController::class, 'showOrder']);
+    
 });
 Auth::routes();
 

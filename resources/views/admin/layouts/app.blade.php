@@ -1,18 +1,23 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('admin/assets/images/favicon.png') }}">
     <title>Nice Admin</title>
 
     <link href="{{ asset('admin/assets/libs/chartist/dist/chartist.min.css') }}" rel="stylesheet">
     <link href="{{ asset('admin/dist/css/style.min.css') }}" rel="stylesheet">
+    <script src="{{ asset('user/js/jquery.js') }}"></script>
 </head>
+
 <body>
-    
-    <div id="main-wrapper" data-navbarbg="skin6" data-theme="light" data-layout="vertical" data-sidebartype="full" data-boxed-layout="full">
+
+    <div id="main-wrapper" data-navbarbg="skin6" data-theme="light" data-layout="vertical" data-sidebartype="full"
+        data-boxed-layout="full">
         @include('admin.layouts.header')
 
         @include('admin.layouts.left-sidebar')
@@ -31,7 +36,8 @@
     <script src="{{ asset('admin/dist/js/sidebarmenu.js') }}"></script>
     <script src="{{ asset('admin/dist/js/custom.js') }}"></script>
     <script src="{{ asset('admin/assets/libs/chartist/dist/chartist.min.js') }}"></script>
-    <script src="{{ asset('admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
+    <script
+        src="{{ asset('admin/assets/libs/chartist-plugin-tooltips/dist/chartist-plugin-tooltip.min.js') }}"></script>
     <script src="{{ asset('admin/dist/js/pages/dashboards/dashboard1.js') }}"></script>
     <script src="https://cdn.ckeditor.com/4.16.0/standard/ckeditor.js"></script>
     <script>
@@ -47,4 +53,5 @@
 
 
 </body>
+
 </html>
