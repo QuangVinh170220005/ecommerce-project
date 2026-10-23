@@ -14,6 +14,7 @@ use App\Http\Controllers\user\AuthController;
 use App\Http\Controllers\user\BlogController as UserBlogController;
 use App\Http\Controllers\user\CartController;
 use App\Http\Controllers\user\CheckoutController;
+use App\Http\Controllers\user\GoogleAuthController;
 use App\Http\Controllers\user\MailController;
 use App\Http\Controllers\user\ProductController;
 use App\Http\Controllers\user\SearchController;
@@ -142,6 +143,11 @@ Route::get('/shop/forgot-password', [AuthController::class, 'fogotPass']);
 Route::post('/shop/forgot-password', [AuthController::class, 'sendMail']);
 Route::get('/shop/reset-password/{id}',[ AuthController::class, 'resetPass']);
 Route::post('/shop/reset-password/{id}', [AuthController::class, 'resetPassword']);
+
+
+// google
+Route::get('/auth/google', [GoogleAuthController::class, 'redirectToGoogle']);
+Route::get('/auth/google/callback', [GoogleAuthController::class, 'handleGoogleCallback']);
 
 
 

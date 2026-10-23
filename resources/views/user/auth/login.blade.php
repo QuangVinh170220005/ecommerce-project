@@ -31,6 +31,29 @@
                     Login
                 </button>
             </form>
+            <div style="margin-top: 20px; text-align: center;">
+
+                <p>Or login with</p>
+
+                <a href="/auth/google"
+                   class="btn btn-default"
+                   style=" display: block; width: 100%; padding: 10px;border: 1px solid #ddd;
+                       border-radius: 4px;
+                       background: #fff;
+                       color: #333;
+                       text-decoration: none;
+                   ">
+
+                    <img
+                        src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                        alt="Google"
+                        width="20"
+                        height="20"
+                        style="vertical-align: middle; margin-right: 8px;"
+                    >
+                    Login with Google
+                </a>
+            </div>
             <p style="margin-top: 15px;">
                 <a href="/shop/forgot-password">Forgot password?</a>
             </p>
